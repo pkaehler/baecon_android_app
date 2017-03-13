@@ -1,4 +1,4 @@
-package com.baecon.rockpapersissersapp;
+package com.baecon.rockpaperscissorsapp;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
