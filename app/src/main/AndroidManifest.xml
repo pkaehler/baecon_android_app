@@ -16,12 +16,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.baecon.rockpaperscissorsapp.DisplayMessageActivity"
-            android:parentActivityName="com.baecon.rockpaperscissorsapp.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.baecon.rockpaperscissorsapp.MainActivity" />
-        </activity>
+            android:name="com.baecon.rockpaperscissorsapp.Options"
+            android:label="@string/options_screen_name" />
     </application>
-
 </manifest>
