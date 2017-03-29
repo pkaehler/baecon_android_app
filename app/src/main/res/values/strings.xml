@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">rock-paper-scissors</string>
-    <!-- Category name for phrases [CHAR LIMIT=20] -->
+    <string name="app_name">rock-paper-scissor</string>
     <string name="options_screen_name">Options</string>
+    <string name="history_screen_name">Last Battles</string>
 </resources>
