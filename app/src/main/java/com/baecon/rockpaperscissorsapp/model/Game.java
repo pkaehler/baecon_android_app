@@ -1,8 +1,4 @@
-package com.baecon.rockpaperscissorsapp;
-
-/**
- * Created by p.kaehler on 31/03/17.
- */
+package com.baecon.rockpaperscissorsapp.model;
 
 public class Game {
 

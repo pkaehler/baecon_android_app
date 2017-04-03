@@ -1,7 +1,9 @@
-package com.baecon.rockpaperscissorsapp;
+package com.baecon.rockpaperscissorsapp.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.baecon.rockpaperscissorsapp.R;
 
 public class OptionActivity extends AppCompatActivity {
 

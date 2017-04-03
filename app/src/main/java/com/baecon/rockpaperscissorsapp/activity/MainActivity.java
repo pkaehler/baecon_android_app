@@ -1,4 +1,4 @@
-package com.baecon.rockpaperscissorsapp;
+package com.baecon.rockpaperscissorsapp.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,7 +6,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.baecon.rockpaperscissorsapp.R;
+
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

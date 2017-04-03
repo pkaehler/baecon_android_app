@@ -1,10 +1,6 @@
-package com.baecon.rockpaperscissorsapp;
+package com.baecon.rockpaperscissorsapp.model;
 
 import java.util.UUID;
-
-/**
- * Created by p.kaehler on 31/03/17.
- */
 
 public class Player {
     private String id;
