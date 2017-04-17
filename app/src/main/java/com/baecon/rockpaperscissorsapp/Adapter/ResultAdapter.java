@@ -11,12 +11,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baecon.rockpaperscissorsapp.R;
-import com.baecon.rockpaperscissorsapp.model.Result;
+import com.baecon.rockpaperscissorsapp.model.Stats;
 
 import java.util.ArrayList;
 
-public class ResultAdapter extends ArrayAdapter<Result> {
-    public ResultAdapter(@NonNull Context context, @NonNull ArrayList<Result> objects) {
+public class ResultAdapter extends ArrayAdapter<Stats> {
+    public ResultAdapter(@NonNull Context context, @NonNull ArrayList<Stats> objects) {
         super(context, 0, objects);
     }
 
@@ -27,17 +27,16 @@ public class ResultAdapter extends ArrayAdapter<Result> {
         if(listItemView == null){
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_battle, parent, false);
         }
-        Result currentResult = getItem(position);
+        Stats currentResult = getItem(position);
 
-        ImageView iconView = (ImageView) listItemView.findViewById(R.id.list_icon);
-        iconView.setImageResource(currentResult.getImageResourceId(currentResult.getAlpha2Code()));
+        TextView textRock = (TextView) listItemView.findViewById(R.id.textTotalRocksPlayed);
+        textRock.setText(currentResult.getRockCount());
 
-        TextView headerText = (TextView) listItemView.findViewById(R.id.textHeader);
-        headerText.setText(currentResult.getName());
+        TextView textPaper = (TextView) listItemView.findViewById(R.id.textTotalPapersPlayed);
+        textPaper.setText(currentResult.getPaperCount());
 
-        TextView footerText = (TextView) listItemView.findViewById(R.id.textFooter);
-        footerText.setText(currentResult.getAlpha3Code());
-
+        TextView textScissors = (TextView) listItemView.findViewById(R.id.textTotalScissorsPlayed);
+        textScissors.setText(currentResult.getScissorCount());
         return listItemView;
     }
 }

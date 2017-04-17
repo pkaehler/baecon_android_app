@@ -6,4 +6,45 @@
     android:layout_height="match_parent"
     tools:context="com.baecon.rockpaperscissorsapp.activity.OptionActivity">
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textSize="24sp"
+        tools:layout_editor_absoluteX="26dp"
+        tools:layout_editor_absoluteY="66dp" />
+
+    <EditText
+        android:id="@+id/inputPlayername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="59dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text=" input here..."
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="113dp" />
+
+    <Button
+        android:id="@+id/savePlayername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="136dp" />
+
+    <TextView
+        android:id="@+id/delete_player"
+        style="@style/ButtonStyle"
+        android:layout_height="50dp"
+        android:layout_marginBottom="0dp"
+        android:background="@color/color_button_delete"
+        android:text="Delete Player"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.003"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

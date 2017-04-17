@@ -7,4 +7,6 @@
     <string name="paper">Paper</string>
     <string name="scissor">Scissors</string>
 
+    <string name="player_name"></string>
+
 </resources>

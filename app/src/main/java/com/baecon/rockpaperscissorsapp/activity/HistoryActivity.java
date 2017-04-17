@@ -1,5 +1,6 @@
 package com.baecon.rockpaperscissorsapp.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -7,9 +8,7 @@ import android.widget.ListView;
 
 import com.baecon.rockpaperscissorsapp.Adapter.ResultAdapter;
 import com.baecon.rockpaperscissorsapp.R;
-import com.baecon.rockpaperscissorsapp.model.Example;
-import com.baecon.rockpaperscissorsapp.model.RestResponse;
-import com.baecon.rockpaperscissorsapp.model.Result;
+import com.baecon.rockpaperscissorsapp.model.Stats;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;
 import com.baecon.rockpaperscissorsapp.rest.ApiInterface;
 
@@ -20,42 +19,49 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HistoryActivity extends AppCompatActivity {
-    String searchPhrase = "GER";
     private static final String TAG = HistoryActivity.class.getSimpleName();
     private ResultAdapter adapter;
+
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        adapter = new ResultAdapter(this, new ArrayList<Result>());
-        getLastGames(searchPhrase);
+        adapter = new ResultAdapter(this, new ArrayList<Stats>());
+        sharedPreferences = getSharedPreferences("userstats",MODE_PRIVATE);
+
+        int id_player = sharedPreferences.getInt("id",3);
+        Log.d(TAG,"id player: " + id_player);
+        getLastGames(id_player);
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setAdapter(adapter);
     }
 
 
-    public void getLastGames(String phrase){
-                ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+    public void getLastGames(int id){
+        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
 
-        Call<Example> call = apiService.getCountriesWithCode(phrase);
-        call.enqueue(new Callback<Example>() {
+        Call<Stats> call = apiService.getStats(id);
+        call.enqueue(new Callback<Stats>() {
             @Override
-            public void onResponse(Call<Example> call, Response<Example> response) {
-                Example resource = response.body();
-                RestResponse result = resource.getRestResponse();
-                adapter.clear();
-                adapter.addAll(result.getResults());
-                adapter.notifyDataSetChanged();
+            public void onResponse(Call<Stats> call, Response<Stats> response) {
+                Stats resource = response.body();
+                int rocks = resource.getRockCount();
+                int papers = resource.getPaperCount();
+                int scissors = resource.getScissorCount();
+                Log.d(TAG,resource.toString());
+//                adapter.clear();
+//                adapter.addAll(resource);
+//                adapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onFailure(Call<Example> call, Throwable t) {
+            public void onFailure(Call<Stats> call, Throwable t) {
                 Log.d(TAG,t.toString());
                 call.cancel();
             }
-
         });
     }
 }

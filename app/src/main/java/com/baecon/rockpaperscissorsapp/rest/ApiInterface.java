@@ -1,17 +1,26 @@
 package com.baecon.rockpaperscissorsapp.rest;
 
-import com.baecon.rockpaperscissorsapp.model.Example;
+import com.baecon.rockpaperscissorsapp.model.Move;
+import com.baecon.rockpaperscissorsapp.model.Stats;
+import com.baecon.rockpaperscissorsapp.model.User;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 public interface ApiInterface {
-    @GET("get/iso2code/{alpha2_code}")
-    Call<Example> getData(@Path("alpha2_code") String alpha2_code);
+    @GET("stats/{id_player}")
+    Call<Stats> getStats(@Path("id_player") int id);
 
-    @GET("search")
-    Call<Example> getCountriesWithCode(@Query("text") String code);
+    @POST("move")
+    Call<Move> setMove(@Body Move move);
+
+    @FormUrlEncoded
+    @POST("registration")
+    Call<User> createPlayer(@Field("name") String playername);
 
 }

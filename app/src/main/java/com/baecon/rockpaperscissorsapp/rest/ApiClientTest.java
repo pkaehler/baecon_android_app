@@ -4,8 +4,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
-public class ApiClient {
-    public static final String BASE_URL = "https://beacon-backend.herokuapp.com/api/1/";
+public class ApiClientTest {
+    public static final String BASE_URL = "http://services.groupkt.com/country/";
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {

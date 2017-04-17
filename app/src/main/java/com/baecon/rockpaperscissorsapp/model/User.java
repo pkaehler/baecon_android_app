@@ -1,9 +1,16 @@
 package com.baecon.rockpaperscissorsapp.model;
 
-import java.util.UUID;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-public class Player {
-    private String id;
+
+public class User {
+    @SerializedName("id")
+    @Expose
+    private int id;
+
+    @SerializedName("name")
+    @Expose
     private String name;
 
     private int victories;
@@ -18,10 +25,8 @@ public class Player {
     private int totalPlayedScissors;
 
 
-    public Player(String name){
-        // id wird vom Backend erstellt
-        // TODO: ID vom Backend holen
-        this.id = generateId();
+    public User(int id, String name){
+        this.id = id;
         this.name = name;
 
         victories = 0;
@@ -39,13 +44,11 @@ public class Player {
         totalPlayedScissors = 0;
     }
 
-
-    private String generateId(){
-        String newId = UUID.randomUUID().toString();
-        return newId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getId(){
+    public int getId(){
         return id;
     }
 

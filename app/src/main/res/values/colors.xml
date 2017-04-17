@@ -9,5 +9,6 @@
     <!-- Background color for app -->
     <color name="tan_background">#FFF7DA</color>
 
-    <color name="color_button">#295426</color>
+    <color name="color_button_menu">#295426</color>
+    <color name="color_button_delete">#FF0000</color>
 </resources>
