@@ -32,7 +32,7 @@ public class HistoryActivity extends AppCompatActivity {
         adapter = new ResultAdapter(this, new ArrayList<Stats>());
         sharedPreferences = getSharedPreferences("userstats",MODE_PRIVATE);
 
-        int id_player = sharedPreferences.getInt("id",3);
+        int id_player = sharedPreferences.getInt("id",0);
         Log.d(TAG,"id player: " + id_player);
         getLastGames(id_player);
         ListView listView = (ListView) findViewById(R.id.list);
@@ -52,9 +52,11 @@ public class HistoryActivity extends AppCompatActivity {
                 int papers = resource.getPaperCount();
                 int scissors = resource.getScissorCount();
                 Log.d(TAG,resource.toString());
-//                adapter.clear();
-//                adapter.addAll(resource);
-//                adapter.notifyDataSetChanged();
+                Log.d(TAG,"Name in Ressource: " + resource.getUser().getName());
+
+                adapter.clear();
+                adapter.addAll(resource);
+                adapter.notifyDataSetChanged();
             }
 
             @Override

@@ -1,6 +1,5 @@
 package com.baecon.rockpaperscissorsapp.model;
 
-import com.baecon.rockpaperscissorsapp.R;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

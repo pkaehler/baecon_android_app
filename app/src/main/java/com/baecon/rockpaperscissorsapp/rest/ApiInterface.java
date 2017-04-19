@@ -14,13 +14,19 @@ import retrofit2.http.Path;
 
 public interface ApiInterface {
     @GET("stats/{id_player}")
-    Call<Stats> getStats(@Path("id_player") int id);
+    Call<Stats> getStats(@Path("id_player") int id_player);
 
+    @GET("game/{id_game}/{id_player}")
+    String getGameOutcome(@Path("id_game") int id_game, @Path("id_player") int id_player);
+
+    @FormUrlEncoded
     @POST("move")
-    Call<Move> setMove(@Body Move move);
+    Call<Move> setMove(@Field("beaconId") int beaconId, @Field("playerId") int playerId, @Field("option") String option);
 
     @FormUrlEncoded
     @POST("registration")
-    Call<User> createPlayer(@Field("name") String playername);
+    Call<User> createPlayer(@Field("name") String playerName);
+
+
 
 }

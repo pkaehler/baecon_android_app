@@ -1,39 +1,64 @@
 package com.baecon.rockpaperscissorsapp.model;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Move {
-    private String playerId;
-    private String beaconId;
-    private String option;
 
-    public Move(String mPlayerId, String mBaeconId, String mOption){
-        playerId = mPlayerId;
-        beaconId = mBaeconId;
-        option = mOption;
+    @SerializedName("id")
+    @Expose
+    private Integer id;
+    @SerializedName("firstUser")
+    @Expose
+    private User firstUser;
+    @SerializedName("secondUser")
+    @Expose
+    private User secondUser;
+    @SerializedName("firstFigure")
+    @Expose
+    private String firstFigure;
+    @SerializedName("secondFigure")
+    @Expose
+    private Object secondFigure;
 
+    public Integer getId() {
+        return id;
     }
 
-
-    public String getBeaconId() {
-        return beaconId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public void setBeaconId(String beaconId) {
-        this.beaconId = beaconId;
+    public User getFirstUser() {
+        return firstUser;
     }
 
-    public String getPlayerId() {
-        return playerId;
+    public void setFirstUser(User firstUser) {
+        this.firstUser = firstUser;
     }
 
-    public void setPlayerId(String playerId) {
-        this.playerId = playerId;
+    public User getSecondUser() {
+        return secondUser;
     }
 
-    public String getOption() {
-        return option;
+    public void setSecondUser(User secondUser) {
+        this.secondUser = secondUser;
     }
 
-    public void setOption(String option) {
-        this.option = option;
+    public String getFirstFigure() {
+        return firstFigure;
     }
+
+    public void setFirstFigure(String firstFigure) {
+        this.firstFigure = firstFigure;
+    }
+
+    public Object getSecondFigure() {
+        return secondFigure;
+    }
+
+    public void setSecondFigure(Object secondFigure) {
+        this.secondFigure = secondFigure;
+    }
+
 }

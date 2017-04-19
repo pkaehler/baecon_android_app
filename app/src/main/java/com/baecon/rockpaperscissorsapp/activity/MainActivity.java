@@ -1,6 +1,5 @@
 package com.baecon.rockpaperscissorsapp.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,15 +12,15 @@ import com.baecon.rockpaperscissorsapp.R;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    Context context;
+
     SharedPreferences sharedPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        context = this;
-        sharedPrefs = context.getSharedPreferences("userstats", Context.MODE_PRIVATE);
+
+        sharedPrefs = getSharedPreferences("userstats", MODE_PRIVATE);
 
         TextView history = (TextView) findViewById(R.id.history);
         history.setOnClickListener(new View.OnClickListener() {
@@ -45,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG,"Testen der shared Prefs: " + sharedPrefs.getInt("id",3));
-        Log.d(TAG,"Testen der shared Prefs: " + sharedPrefs.getString("playername",null));
+//        Log.d(TAG,"Testen der shared Prefs: " + sharedPrefs.getInt("id",0));
+//        Log.d(TAG,"Testen der shared Prefs: " + sharedPrefs.getString("playername",null));
     }
 }

@@ -16,6 +16,8 @@ import com.baecon.rockpaperscissorsapp.model.User;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;
 import com.baecon.rockpaperscissorsapp.rest.ApiInterface;
 
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,14 +43,16 @@ public class OptionActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         playerName = playerNameEditText.getText().toString();
                         if (!sharedPrefs.contains("playername")){
-                            editor.putString("playername",playerName);
-                            editor.commit();
                             createPlayer(playerName);
-
                         } else {
+                            Map<String,?> allEntries = sharedPrefs.getAll();
+                            for (Map.Entry<String,?> entry : allEntries.entrySet()){
+                                Log.d(TAG,"Alle Einträge: " + entry.getKey() + " und Value " + entry.getValue().toString());
+                            }
+
                             new AlertDialog.Builder(OptionActivity.this)
                                     .setTitle("Jo")
-                                    .setMessage("a player already exists: " + sharedPrefs.getString("playername",null))
+                                    .setMessage("a player already exists: " + sharedPrefs.getString("playername",null) + " with id: " + sharedPrefs.getInt("id",0))
                                     .setNegativeButton("KK", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
@@ -96,8 +100,10 @@ public class OptionActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) {
                 User newUser = (User) response.body();
+                Log.d(TAG,"Neuer Nutzer erstellt: " + newUser.getId() + " " + newUser.getName() + " and untentschieden " + newUser.getDraws());
                 editor.putInt("id", newUser.getId());
                 editor.putString("playername", newUser.getName());
+                editor.commit();
             }
 
             @Override
