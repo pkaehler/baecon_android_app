@@ -1,3 +1,12 @@
 <resources>
-    <string name="app_name">RockPaperSissersApp</string>
+    <string name="app_name">Rock Paper Scissors</string>
+    <string name="options_screen_name">Options</string>
+    <string name="history_screen_name">Last Battles</string>
+
+    <string name="rock">Rock</string>
+    <string name="paper">Paper</string>
+    <string name="scissor">Scissors</string>
+    <!--TODO raus?-->
+    <string name="kontakt_io_api_key">xxx</string>
+
 </resources>

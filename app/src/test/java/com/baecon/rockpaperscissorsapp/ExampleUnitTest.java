@@ -1,4 +1,4 @@
-package com.baecon.rockpapersissersapp;
+package com.baecon.rockpaperscissorsapp;
 
 import org.junit.Test;
 
