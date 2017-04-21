@@ -6,7 +6,7 @@
     <string name="rock">Rock</string>
     <string name="paper">Paper</string>
     <string name="scissor">Scissors</string>
-
-    <string name="kontakt_io_api_key">SkldmVrpdhaEyDikobSELqnYXipXyKeC</string>
+    <!--TODO raus?-->
+    <string name="kontakt_io_api_key">xxx</string>
 
 </resources>

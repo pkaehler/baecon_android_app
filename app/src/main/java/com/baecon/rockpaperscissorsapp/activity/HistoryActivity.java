@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
 
-import com.baecon.rockpaperscissorsapp.Adapter.ResultAdapter;
+import com.baecon.rockpaperscissorsapp.adapter.ResultAdapter;
 import com.baecon.rockpaperscissorsapp.R;
 import com.baecon.rockpaperscissorsapp.model.Stats;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;

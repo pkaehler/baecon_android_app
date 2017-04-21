@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baecon.rockpaperscissorsapp.R;
@@ -39,12 +39,20 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(optionsIntent);
             }
         });
+
+        // FLiegt raus
+        //TODO: Suche Beacon
+        // Wenn gefunden, dann validiere
+        // Wenn TRUE dann rufe Spiele Bildschirm auf
+        // Code aus GameActivity
+        ImageView background =  (ImageView) findViewById(R.id.background);
+        background.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent bluetoothIntent = new Intent(MainActivity.this, GameActivity.class);
+                startActivity(bluetoothIntent);
+            }
+        });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        Log.d(TAG,"Testen der shared Prefs: " + sharedPrefs.getInt("id",0));
-//        Log.d(TAG,"Testen der shared Prefs: " + sharedPrefs.getString("playername",null));
-    }
 }

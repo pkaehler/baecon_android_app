@@ -92,8 +92,6 @@ public class OptionActivity extends AppCompatActivity {
 
     public void createPlayer(String name){
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-        Log.d(TAG, ApiClient.BASE_URL);
-
 
         Call<User> call = apiService.createPlayer(name);
         call.enqueue(new Callback<User>() {

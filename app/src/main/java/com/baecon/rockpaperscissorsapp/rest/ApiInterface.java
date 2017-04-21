@@ -27,6 +27,9 @@ public interface ApiInterface {
     @POST("registration")
     Call<User> createPlayer(@Field("name") String playerName);
 
+    @GET("isValidBeacon/{id_beacon}")
+    Call<String> isValidBeacon(@Path("id_beacon") String id_beacon);
+
 
 
 }
