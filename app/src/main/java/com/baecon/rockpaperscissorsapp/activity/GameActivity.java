@@ -31,8 +31,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
-        // Metadata nutzen
+        
         // Key verstecken
         //TODO: key hier drin lassen (also dynamisch) oder im manifest lassen (statisch)
         KontaktSDK.initialize(APIKEY);
