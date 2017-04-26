@@ -59,7 +59,7 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
 
-    public void getLastGames(int id){
+    private void getLastGames(int id){
         final ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
 
         Call<Stats> call = apiService.getStats(id);

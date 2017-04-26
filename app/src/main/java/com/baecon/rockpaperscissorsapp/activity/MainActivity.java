@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     SharedPreferences sharedPrefs;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         sharedPrefs = getSharedPreferences("userstats", MODE_PRIVATE);
+        editor = sharedPrefs.edit();
 
         TextView history = (TextView) findViewById(R.id.history);
         history.setOnClickListener(new View.OnClickListener() {
@@ -66,6 +68,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent optionsIntent = new Intent(MainActivity.this, OptionActivity.class);
                 startActivity(optionsIntent);
+            }
+        });
+
+        ImageView logo = (ImageView) findViewById(R.id.background);
+        logo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
+                startActivity(gameIntent);
             }
         });
 
@@ -111,8 +122,10 @@ public class MainActivity extends AppCompatActivity {
             public void onIBeaconDiscovered(IBeaconDevice ibeacon, IBeaconRegion region) {
 
                 if (isValidBeacon(String.valueOf(ibeacon.getProximityUUID())) ) {
-                    //TODO starte spiel
-                    // speeichere beaconid fürs backend in shared prefs
+                    // TODO id_beacon in lokale db oder Liste
+                    editor.putString("id_beacon", ibeacon.getUniqueId());
+                    editor.commit();
+
                     NotificationCompat.Builder mBuilder =
                             (NotificationCompat.Builder) new NotificationCompat.Builder(MainActivity.this)
                             .setSmallIcon(R.drawable.battleicon)
@@ -156,8 +169,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isValidBeacon(String beaconID){
-        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-        Call<String> call = apiService.isValidBeacon(beaconID);
+//        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+//        Call<String> call = apiService.isValidBeacon(beaconID);
 //        try {
 //            Log.d(TAG,"returning True for UUID: " + beaconID);
 //            Response<String> isValid = call.execute();

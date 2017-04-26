@@ -98,6 +98,7 @@ public class OptionActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) {
                 User newUser = (User) response.body();
+                // TODO id_player in lokale db oder Liste
                 editor.putInt("id", newUser.getId());
                 editor.putString("playername", newUser.getName());
                 editor.commit();

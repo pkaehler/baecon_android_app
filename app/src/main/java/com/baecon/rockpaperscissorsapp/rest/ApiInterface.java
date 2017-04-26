@@ -23,7 +23,7 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("move")
-    Call<Move> setMove(@Field("beaconId") String beaconId, @Field("playerId") int playerId, @Field("option") String option);
+    Call<Move> setMove(@Field("beaconId") int beaconId, @Field("playerId") int playerId, @Field("option") String option);
 
     @FormUrlEncoded
     @POST("registration")
