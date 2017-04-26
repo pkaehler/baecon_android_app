@@ -4,6 +4,8 @@ import com.baecon.rockpaperscissorsapp.model.Move;
 import com.baecon.rockpaperscissorsapp.model.Stats;
 import com.baecon.rockpaperscissorsapp.model.User;
 
+import java.util.UUID;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -21,7 +23,7 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("move")
-    Call<Move> setMove(@Field("beaconId") int beaconId, @Field("playerId") int playerId, @Field("option") String option);
+    Call<Move> setMove(@Field("beaconId") String beaconId, @Field("playerId") int playerId, @Field("option") String option);
 
     @FormUrlEncoded
     @POST("registration")

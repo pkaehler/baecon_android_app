@@ -40,7 +40,20 @@ public class HistoryActivity extends AppCompatActivity {
 
         int id_player = sharedPreferences.getInt("id",0);
         Log.d(TAG,"id player: " + id_player);
-        getLastGames(id_player);
+        if (id_player != 0 ){
+            getLastGames(id_player);
+        } else{
+            new AlertDialog.Builder(HistoryActivity.this)
+                    .setMessage("No player found")
+                    .setNegativeButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .show();
+        }
+
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setAdapter(adapter);
     }
@@ -55,12 +68,11 @@ public class HistoryActivity extends AppCompatActivity {
             public void onResponse(Call<Stats> call, Response<Stats> response) {
                 if (response.code() == 400) {
                     Gson gson = new GsonBuilder().create();
-                    ReturnedErrorMessage errorMessage = new ReturnedErrorMessage();
+                    ReturnedErrorMessage errorMessage;
 
                     try {
                         errorMessage = gson.fromJson(response.errorBody().string(),ReturnedErrorMessage.class);
                         new AlertDialog.Builder(HistoryActivity.this)
-                                .setTitle("Loot upassen")
                                 .setMessage("something went wrong. Got: " + errorMessage.getErrorCode() + " with message " + errorMessage.getErrorMessage())
                                 .setNegativeButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
                                     @Override
@@ -69,7 +81,6 @@ public class HistoryActivity extends AppCompatActivity {
                                     }
                                 })
                                 .show();
-                        Log.d(TAG,"Fehler: " + response.body());
                         return;
                     } catch (IOException e) {
                         e.printStackTrace();

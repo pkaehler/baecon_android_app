@@ -1,16 +1,21 @@
 package com.baecon.rockpaperscissorsapp.activity;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baecon.rockpaperscissorsapp.R;
+import com.baecon.rockpaperscissorsapp.model.Game;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;
 import com.baecon.rockpaperscissorsapp.rest.ApiInterface;
 import com.kontakt.sdk.android.ble.connection.OnServiceReadyListener;
@@ -22,8 +27,13 @@ import com.kontakt.sdk.android.common.KontaktSDK;
 import com.kontakt.sdk.android.common.profile.IBeaconDevice;
 import com.kontakt.sdk.android.common.profile.IBeaconRegion;
 
-import retrofit2.Call;
+import java.io.IOException;
+import java.util.UUID;
 
+import retrofit2.Call;
+import retrofit2.Response;
+
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 public class MainActivity extends AppCompatActivity {
@@ -67,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //TODO auslagern in eigene Klasse ?
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -101,11 +109,32 @@ public class MainActivity extends AppCompatActivity {
         return new SimpleIBeaconListener() {
             @Override
             public void onIBeaconDiscovered(IBeaconDevice ibeacon, IBeaconRegion region) {
-                if (isValidBeacon(ibeacon.getUniqueId()) ) {
+
+                if (isValidBeacon(String.valueOf(ibeacon.getProximityUUID())) ) {
                     //TODO starte spiel
+                    // speeichere beaconid fürs backend in shared prefs
+                    NotificationCompat.Builder mBuilder =
+                            (NotificationCompat.Builder) new NotificationCompat.Builder(MainActivity.this)
+                            .setSmallIcon(R.drawable.battleicon)
+                            .setContentTitle("Yo")
+                            .setContentText("wanna fight?");
+                    Intent notificationIntent = new Intent(MainActivity.this, GameActivity.class);
+                    PendingIntent notificaitonPendingIntent =
+                            PendingIntent.getActivity(
+                                    MainActivity.this,
+                                    0,
+                                    notificationIntent,
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+
+                    mBuilder.setContentIntent(notificaitonPendingIntent);
+
+                    int mNotificationId = 001;
+                    NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                    mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
                     new AlertDialog.Builder(MainActivity.this)
                             .setIcon(R.drawable.battleicon)
-                            .setTitle("Loot upassen")
                             .setMessage("iBeacon " + ibeacon.getUniqueId() + " wurde gefunden.")
                             .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
                                 @Override
@@ -128,12 +157,16 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isValidBeacon(String beaconID){
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-
         Call<String> call = apiService.isValidBeacon(beaconID);
 //        try {
-        return TRUE;
+//            Log.d(TAG,"returning True for UUID: " + beaconID);
+//            Response<String> isValid = call.execute();
+//            Log.d(TAG,"" + isValid.message());
+//            Log.d(TAG,"Api says: " + isValid.body().toString());
+            return TRUE;
 //            return Boolean.valueOf(call.execute().body());
 //        } catch (IOException e) {
+//            Log.d(TAG,"returning False for UUID: " + beaconID);
 //            return FALSE;
 //        }
     }

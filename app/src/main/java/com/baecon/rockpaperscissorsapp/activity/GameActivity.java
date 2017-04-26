@@ -33,5 +33,9 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        //TODO: lesen der shared pref (beaconid, playerid)
+        //TODO: onclick listener und restcall rausflanken mit
+        //setMove(@Field("beaconId") int beaconId, @Field("playerId") int playerId, @Field("option") String option);
+
     }
 }
