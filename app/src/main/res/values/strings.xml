@@ -3,10 +3,15 @@
     <string name="options_screen_name">Options</string>
     <string name="history_screen_name">Last Battles</string>
 
+    <string name="delete_user">Delete current Player</string>
+
+    <string name="fight">Fight!!</string>
+
     <string name="rock">Rock</string>
     <string name="paper">Paper</string>
     <string name="scissor">Scissors</string>
-    <!--TODO raus?-->
-    <string name="kontakt_io_api_key">xxx</string>
+
+    <string name="ok_label">kk</string>
+    <string name="cancel_label">nope</string>
 
 </resources>

@@ -98,10 +98,20 @@ public class OptionActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) {
                 User newUser = (User) response.body();
-                Log.d(TAG,"Neuer Nutzer erstellt: " + newUser.getId() + " " + newUser.getName() + " and untentschieden " + newUser.getDraws());
+                // TODO id_player in lokale db oder Liste
                 editor.putInt("id", newUser.getId());
                 editor.putString("playername", newUser.getName());
                 editor.commit();
+                new AlertDialog.Builder(OptionActivity.this)
+                        .setTitle("Loot upassen")
+                        .setMessage("player was born: " + sharedPrefs.getString("playername",null) + " with id: " + sharedPrefs.getInt("id",0))
+                        .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .show();
             }
 
             @Override

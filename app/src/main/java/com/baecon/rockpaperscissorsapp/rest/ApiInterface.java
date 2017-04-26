@@ -4,6 +4,8 @@ import com.baecon.rockpaperscissorsapp.model.Move;
 import com.baecon.rockpaperscissorsapp.model.Stats;
 import com.baecon.rockpaperscissorsapp.model.User;
 
+import java.util.UUID;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
