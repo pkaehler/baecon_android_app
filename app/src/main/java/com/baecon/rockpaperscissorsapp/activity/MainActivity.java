@@ -170,7 +170,8 @@ public class MainActivity extends AppCompatActivity {
                                     (NotificationCompat.Builder) new NotificationCompat.Builder(MainActivity.this)
                                             .setSmallIcon(R.drawable.battleicon)
                                             .setContentTitle("Yo")
-                                            .setContentText("wanna fight?");
+                                            .setContentText("wanna fight?")
+                                            .setAutoCancel(true);
                             Intent notificationIntent = new Intent(MainActivity.this, GameActivity.class);
                             PendingIntent notificaitonPendingIntent =
                                     PendingIntent.getActivity(
