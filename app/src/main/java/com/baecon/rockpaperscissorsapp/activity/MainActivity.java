@@ -6,18 +6,21 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baecon.rockpaperscissorsapp.R;
-import com.baecon.rockpaperscissorsapp.model.Game;
+import com.baecon.rockpaperscissorsapp.model.ReturnedErrorMessage;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;
 import com.baecon.rockpaperscissorsapp.rest.ApiInterface;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.kontakt.sdk.android.ble.connection.OnServiceReadyListener;
 import com.kontakt.sdk.android.ble.manager.ProximityManager;
 import com.kontakt.sdk.android.ble.manager.ProximityManagerFactory;
@@ -28,13 +31,10 @@ import com.kontakt.sdk.android.common.profile.IBeaconDevice;
 import com.kontakt.sdk.android.common.profile.IBeaconRegion;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
-
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         sharedPrefs = getSharedPreferences("userstats", MODE_PRIVATE);
         editor = sharedPrefs.edit();
@@ -121,67 +123,102 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onIBeaconDiscovered(IBeaconDevice ibeacon, IBeaconRegion region) {
 
-                if (isValidBeacon(String.valueOf(ibeacon.getProximityUUID())) ) {
+                isValidBeacon(String.valueOf(ibeacon.getUniqueId()));
                     // TODO id_beacon in lokale db oder Liste
-                    editor.putString("id_beacon", ibeacon.getUniqueId());
-                    editor.commit();
 
-                    NotificationCompat.Builder mBuilder =
-                            (NotificationCompat.Builder) new NotificationCompat.Builder(MainActivity.this)
-                            .setSmallIcon(R.drawable.battleicon)
-                            .setContentTitle("Yo")
-                            .setContentText("wanna fight?");
-                    Intent notificationIntent = new Intent(MainActivity.this, GameActivity.class);
-                    PendingIntent notificaitonPendingIntent =
-                            PendingIntent.getActivity(
-                                    MainActivity.this,
-                                    0,
-                                    notificationIntent,
-                                    PendingIntent.FLAG_UPDATE_CURRENT
-                            );
-
-                    mBuilder.setContentIntent(notificaitonPendingIntent);
-
-                    int mNotificationId = 001;
-                    NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                    mNotifyMgr.notify(mNotificationId, mBuilder.build());
-
-                    new AlertDialog.Builder(MainActivity.this)
-                            .setIcon(R.drawable.battleicon)
-                            .setMessage("iBeacon " + ibeacon.getUniqueId() + " wurde gefunden.")
-                            .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
-                                    startActivity(gameIntent);
-                                }
-                            })
-                            .setNegativeButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                }
-                            })
-                            .show();
                 }
-            }
         };
     }
 
-    private boolean isValidBeacon(String beaconID){
-//        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-//        Call<String> call = apiService.isValidBeacon(beaconID);
-//        try {
-//            Log.d(TAG,"returning True for UUID: " + beaconID);
-//            Response<String> isValid = call.execute();
-//            Log.d(TAG,"" + isValid.message());
-//            Log.d(TAG,"Api says: " + isValid.body().toString());
-            return TRUE;
-//            return Boolean.valueOf(call.execute().body());
-//        } catch (IOException e) {
-//            Log.d(TAG,"returning False for UUID: " + beaconID);
-//            return FALSE;
-//        }
+    private void isValidBeacon(final String beaconID){
+        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+        Call<String> call = apiService.isvalidbeacon(beaconID);
+            Log.d(TAG,"returning True for UUID: " + beaconID);
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    if (response.code() == 400) {
+                        Gson gson = new GsonBuilder().create();
+                        ReturnedErrorMessage errorMessage;
+
+                        try {
+                            errorMessage = gson.fromJson(response.errorBody().string(), ReturnedErrorMessage.class);
+                            new AlertDialog.Builder(MainActivity.this)
+                                    .setMessage("something went wrong. Got: " + errorMessage.getErrorCode() + " with message " + errorMessage.getErrorMessage())
+                                    .setNegativeButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+
+                                        }
+                                    })
+                                    .show();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        ImageView beaconIconVisible = (ImageView) findViewById(R.id.beaconFound);
+                        beaconIconVisible.setAlpha(1f);
+
+                        boolean sawBeaconOverlay = getSharedPreferences("userstats", MODE_PRIVATE).getBoolean("sawBeaconOverlay", false);
+
+
+                        String isValid = response.body();
+                        editor.putString("id_beacon", beaconID);
+                        editor.commit();
+                        if (isValid.equals("true")) {
+                            NotificationCompat.Builder mBuilder =
+                                    (NotificationCompat.Builder) new NotificationCompat.Builder(MainActivity.this)
+                                            .setSmallIcon(R.drawable.battleicon)
+                                            .setContentTitle("Yo")
+                                            .setContentText("wanna fight?");
+                            Intent notificationIntent = new Intent(MainActivity.this, GameActivity.class);
+                            PendingIntent notificaitonPendingIntent =
+                                    PendingIntent.getActivity(
+                                            MainActivity.this,
+                                            0,
+                                            notificationIntent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT
+                                    );
+
+                            mBuilder.setContentIntent(notificaitonPendingIntent);
+
+                            int mNotificationId = 001;
+                            NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
+                            if (!sawBeaconOverlay){
+                                editor.putBoolean("sawBeaconOverlay",true);
+                                editor.commit();
+
+                                new AlertDialog.Builder(MainActivity.this)
+                                        .setIcon(R.drawable.battleicon)
+                                        .setMessage("Beacon gefunden. Want to play a game?")
+                                        .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
+                                                startActivity(gameIntent);
+                                            }
+                                        })
+                                        .setNegativeButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                            }
+                                        })
+                                        .show();
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    Log.d(TAG,t.toString());
+                    call.cancel();
+                }
+            });
+
     }
 
 }

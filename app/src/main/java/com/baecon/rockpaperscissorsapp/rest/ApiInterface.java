@@ -1,9 +1,11 @@
 package com.baecon.rockpaperscissorsapp.rest;
 
+import com.baecon.rockpaperscissorsapp.model.GameResult;
 import com.baecon.rockpaperscissorsapp.model.Move;
 import com.baecon.rockpaperscissorsapp.model.Stats;
 import com.baecon.rockpaperscissorsapp.model.User;
 
+import java.util.List;
 import java.util.UUID;
 
 import retrofit2.Call;
@@ -23,15 +25,17 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("move")
-    Call<Move> setMove(@Field("beaconId") int beaconId, @Field("playerId") int playerId, @Field("option") String option);
+    Call<Move> setMove(@Field("beaconId") String beaconId, @Field("playerId") int playerId, @Field("option") String option);
 
     @FormUrlEncoded
     @POST("registration")
     Call<User> createPlayer(@Field("name") String playerName);
 
-    @GET("isValidBeacon/{id_beacon}")
-    Call<String> isValidBeacon(@Path("id_beacon") String id_beacon);
+    @GET("isvalidbeacon/{id_beacon}")
+    Call<String> isvalidbeacon(@Path("id_beacon") String id_beacon);
 
+    @GET("allgamesforplayer/{id_player}")
+    Call<List<GameResult>> getAllGamesForPlayer(@Path("id_player") int id_player);
 
 
 }
