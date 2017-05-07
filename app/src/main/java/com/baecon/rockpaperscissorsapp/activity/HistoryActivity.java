@@ -10,6 +10,7 @@ import android.widget.ListView;
 
 import com.baecon.rockpaperscissorsapp.adapter.ResultAdapter;
 import com.baecon.rockpaperscissorsapp.R;
+import com.baecon.rockpaperscissorsapp.db.DatabaseHandler;
 import com.baecon.rockpaperscissorsapp.model.GameResult;
 import com.baecon.rockpaperscissorsapp.model.ReturnedErrorMessage;
 import com.baecon.rockpaperscissorsapp.model.Stats;
@@ -29,6 +30,8 @@ import retrofit2.Response;
 public class HistoryActivity extends AppCompatActivity {
     private static final String TAG = HistoryActivity.class.getSimpleName();
     private ResultAdapter adapter;
+    private static int id_player;
+    private static String playerName;
 
     SharedPreferences sharedPreferences;
 
@@ -36,11 +39,13 @@ public class HistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+        final DatabaseHandler db = new DatabaseHandler(this);
 
         adapter = new ResultAdapter(this, new ArrayList<Stats>());
         sharedPreferences = getSharedPreferences("userstats",MODE_PRIVATE);
+        playerName = sharedPreferences.getString("playername",null);
+        id_player = db.getPlayer(playerName).getId();
 
-        int id_player = sharedPreferences.getInt("id",0);
         Log.d(TAG,"id player: " + id_player);
         if (id_player != 0 ){
             getLastGames(id_player);

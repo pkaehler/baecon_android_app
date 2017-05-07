@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baecon.rockpaperscissorsapp.R;
+import com.baecon.rockpaperscissorsapp.db.DatabaseHandler;
 import com.baecon.rockpaperscissorsapp.model.Move;
 import com.baecon.rockpaperscissorsapp.model.ReturnedErrorMessage;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;
@@ -43,16 +44,20 @@ public class GameActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     private static String id_beacon = null;
     private static int id_player;
+    private static String playerName;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        final DatabaseHandler db = new DatabaseHandler(this);
 
         sharedPreferences = getSharedPreferences("userstats",MODE_PRIVATE);
-        id_beacon = sharedPreferences.getString("id_beacon",null);
-        id_player = sharedPreferences.getInt("id",0);
+        playerName = sharedPreferences.getString("playername",null);
+//        id_beacon = sharedPreferences.getString("id_beacon",null);
+        id_beacon = "4LKv";
+        id_player = db.getPlayer(playerName).getId();
 
         final ImageView rock = (ImageView) findViewById(R.id.rockBattleOption);
         final ImageView paper = (ImageView) findViewById(R.id.paperBattleOption);

@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private ProximityManager proximityManager;
     private static final String APIKEY = "ok";
+    private String playerName;
 
 
     SharedPreferences sharedPrefs;
@@ -51,10 +52,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-
         sharedPrefs = getSharedPreferences("userstats", MODE_PRIVATE);
         editor = sharedPrefs.edit();
-
+        playerName = sharedPrefs.getString("playername",null);
+        if (playerName != null){
+            TextView active_player = (TextView) findViewById(R.id.main_active_player);
+            active_player.setText(playerName);
+            active_player.setAlpha(1f);
+        }
         TextView history = (TextView) findViewById(R.id.history);
         history.setOnClickListener(new View.OnClickListener() {
            @Override
@@ -124,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
             public void onIBeaconDiscovered(IBeaconDevice ibeacon, IBeaconRegion region) {
 
                 isValidBeacon(String.valueOf(ibeacon.getUniqueId()));
-                    // TODO id_beacon in lokale db oder Liste
+                    // TODO id_beacon in lokale db
 
                 }
         };
@@ -222,4 +227,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        playerName = sharedPrefs.getString("playername",null);
+        if (playerName != null){
+            TextView active_player = (TextView) findViewById(R.id.main_active_player);
+            active_player.setText(playerName);
+            active_player.setAlpha(1f);
+        }
+    }
 }
