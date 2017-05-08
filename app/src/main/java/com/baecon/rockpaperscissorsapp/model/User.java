@@ -13,35 +13,17 @@ public class User {
     @Expose
     private String name;
 
-    private int victories;
-    private int draws;
-    private int losses;
+    @SerializedName("is_active")
+    @Expose
+    private int is_active;
 
-    private int wonWithRock;
-    private int totalPlayedRocks;
-    private int wonWithPaper;
-    private int totalPlayedPapers;
-    private int wonWithScissors;
-    private int totalPlayedScissors;
-
+    public User(){}
 
     public User(int id, String name){
         this.id = id;
         this.name = name;
+        this.is_active = 0;
 
-        victories = 0;
-        draws = 0;
-        losses = 0;
-
-        //Die Stats werden auch durch Backend bereit gestellt
-        //werden aber auch lokal gespeichert, damit keine Inet Verbindung nötig ist
-        wonWithPaper = 0;
-        wonWithRock = 0;
-        wonWithScissors = 0;
-
-        totalPlayedPapers = 0;
-        totalPlayedRocks = 0;
-        totalPlayedScissors = 0;
     }
 
     public void setId(int id) {
@@ -52,43 +34,19 @@ public class User {
         return id;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getName(){
         return name;
     }
 
-    public int getWonWithRock() {
-        return wonWithRock;
+    public int getIs_active() {
+        return is_active;
     }
 
-    public int getTotalPlayedRocks() {
-        return totalPlayedRocks;
-    }
-
-    public int getWonWithPaper() {
-        return wonWithPaper;
-    }
-
-    public int getTotalPlayedPapers() {
-        return totalPlayedPapers;
-    }
-
-    public int getWonWithScissors() {
-        return wonWithScissors;
-    }
-
-    public int getTotalPlayedScissors() {
-        return totalPlayedScissors;
-    }
-
-    public int getVictories() {
-        return victories;
-    }
-
-    public int getDraws() {
-        return draws;
-    }
-
-    public int getLosses() {
-        return losses;
+    public void setIs_active(int is_active) {
+        this.is_active = is_active;
     }
 }

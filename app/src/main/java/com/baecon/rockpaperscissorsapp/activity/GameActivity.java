@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baecon.rockpaperscissorsapp.R;
+import com.baecon.rockpaperscissorsapp.db.DatabaseHandler;
 import com.baecon.rockpaperscissorsapp.model.Move;
 import com.baecon.rockpaperscissorsapp.model.ReturnedErrorMessage;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;
@@ -41,21 +42,23 @@ public class GameActivity extends AppCompatActivity {
     private static final String TAG = GameActivity.class.getSimpleName();
     private static String OPTION;
     SharedPreferences sharedPreferences;
-    private static String id_beacon ="tobedefined";
+    private static String id_beacon = null;
     private static int id_player;
+    private static String playerName;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        final DatabaseHandler db = new DatabaseHandler(this);
 
         sharedPreferences = getSharedPreferences("userstats",MODE_PRIVATE);
+        playerName = sharedPreferences.getString("playername",null);
 //        id_beacon = sharedPreferences.getString("id_beacon",null);
-        id_player = sharedPreferences.getInt("id",0);
-        //TODO: lesen der shared pref (beaconid, playerid)
-        //TODO: onclick listener und restcall rausflanken mit
-//        setMove(@Field("beaconId") int beaconId, @Field("playerId") int playerId, @Field("option") String option);
+        id_beacon = "4LKv";
+        id_player = db.getPlayer(playerName).getId();
+
         final ImageView rock = (ImageView) findViewById(R.id.rockBattleOption);
         final ImageView paper = (ImageView) findViewById(R.id.paperBattleOption);
         final ImageView scissors = (ImageView) findViewById(R.id.scissorsBattleOption);
@@ -93,7 +96,29 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Fight with following: " + id_beacon + " and player " + id_player + " and option " + OPTION);
-                fight(id_beacon,id_player,OPTION);
+                if (id_beacon != null && id_player != 0) {
+                    fight(id_beacon, id_player, OPTION);
+                } else if (id_beacon == null){
+                    new AlertDialog.Builder(GameActivity.this)
+                            .setMessage("Can't make a move due to missing Beacon")
+                            .setPositiveButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })
+                            .show();
+                } else {
+                    new AlertDialog.Builder(GameActivity.this)
+                            .setMessage("No user found on device")
+                            .setPositiveButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })
+                            .show();
+                }
             }
         });
 
@@ -102,7 +127,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void fight(String id_beacon, int id_player, String option){
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-        Call<Move> call = apiService.setMove(123,id_player,option);
+        Call<Move> call = apiService.setMove(id_beacon,id_player,option);
         call.enqueue(new Callback<Move>() {
             @Override
             public void onResponse(Call<Move> call, Response<Move> response) {
