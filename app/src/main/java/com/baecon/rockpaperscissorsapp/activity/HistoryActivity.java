@@ -40,10 +40,12 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
         final DatabaseHandler db = new DatabaseHandler(this);
+        Log.d(TAG, "Database created");
 
         adapter = new ResultAdapter(this, new ArrayList<Stats>());
         sharedPreferences = getSharedPreferences("userstats",MODE_PRIVATE);
         playerName = sharedPreferences.getString("playername",null);
+        Log.d(TAG,"Player in Pref: " + playerName);
         id_player = db.getPlayer(playerName).getId();
 
         Log.d(TAG,"id player: " + id_player);

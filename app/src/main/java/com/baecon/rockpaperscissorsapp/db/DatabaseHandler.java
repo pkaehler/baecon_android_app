@@ -72,16 +72,26 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
     public User getPlayer(String name){
         SQLiteDatabase db = this.getReadableDatabase();
+        User user = new User();
 
         ContentValues values = new ContentValues();
         String selectQuery = "SELECT * FROM " + TABLE_PLAYERS + " WHERE " + FIELD_NAME + " = \"" + name + "\"" ;
-
+        Log.d(TAG, "Running Query: " + selectQuery);
         Cursor cursor = db.rawQuery(selectQuery,null);
-        cursor.moveToFirst();
-        User user = new User();
-        user.setId(Integer.parseInt(cursor.getString(0)));
-        user.setName(cursor.getString(1));
-
+        if (cursor != null && cursor.getCount() > 0){
+            Log.d(TAG, "Moving cursor to first");
+            if  (cursor.moveToFirst()){
+                Log.d(TAG, "Moved cursor to first");
+                user.setId(Integer.parseInt(cursor.getString(0)));
+                user.setName(cursor.getString(1));
+            }
+        } else {
+            Log.d(TAG, "using else part");
+            user.setId(0);
+            user.setName("no User created");
+        }
+        db.close();
+        Log.d(TAG,"User looks like " + user.getId() + " " + user.getName());
         return user;
     }
 
