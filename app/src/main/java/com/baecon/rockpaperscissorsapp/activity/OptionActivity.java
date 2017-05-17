@@ -76,7 +76,7 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
                             createPlayer(playerName);
                             editor.putString("playername",playerName);
                             editor.commit();
-                            List<User> userList = db.getAllPlayer();
+//                            List<User> userList = db.getAllPlayer();
 //                            Map<String,?> allEntries = sharedPrefs.getAll();
 //                            for (Map.Entry<String,?> entry : allEntries.entrySet()){
 //                                Log.d(TAG,"Alle Einträge: " + entry.getKey() + " und Value " + entry.getValue().toString());
@@ -111,9 +111,10 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
                                 editor.remove("playername");
                                 editor.commit();
                                 db.deletePlayer(active_player);
-//                                adapter.clear();
-//                                adapter.addAll(newUserList);
-//                                adapter.notifyDataSetChanged();
+                                List<User> newUserList = db.getAllPlayer();
+                                adapter.clear();
+                                adapter.addAll(newUserList);
+                                adapter.notifyDataSetChanged();
 
                             }
                         })
