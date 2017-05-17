@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.media.Image;
 import android.nfc.Tag;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -57,8 +58,13 @@ public class GameActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences("userstats",MODE_PRIVATE);
         playerName = sharedPreferences.getString("playername",null);
-        id_beacon = sharedPreferences.getString("id_beacon",null);
-//        id_beacon = "4LKv";
+        //Check if emulator is running
+        String fingerprint = Build.FINGERPRINT;
+        boolean isEmulator = false;
+        if (fingerprint != null) {
+            isEmulator = fingerprint.contains("vbox") || fingerprint.contains("generic");
+        }
+        id_beacon = (isEmulator == true) ? "4LKv" : sharedPreferences.getString("id_beacon",null);
         id_player = db.getPlayer(playerName).getId();
 
         final ImageView rock = (ImageView) findViewById(R.id.rockBattleOption);
@@ -168,7 +174,7 @@ public class GameActivity extends AppCompatActivity {
                             Log.d(TAG,"here is the result: "  + result.getResult());
                             //TODO überarbeiten mit Bild
                             new AlertDialog.Builder(GameActivity.this)
-                                    .setMessage("you " + result.getResult() + " against " + result.getOption())
+                                    .setMessage("you " + result.getResult() + " with " + result.getOption())
 //                                    .setIcon(R.drawable.)
                                     .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
                                         @Override

@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="center_vertical"
-    android:orientation="vertical"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:padding="16dp">
+    android:orientation="vertical"
+    android:paddingLeft="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:paddingBottom="5dp"
-        android:paddingTop="5dp">
+        android:paddingBottom="5dp">
 
         <ImageView
             android:id="@+id/list_icon_rock"
@@ -88,8 +87,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:paddingBottom="5dp"
-        android:paddingTop="5dp">
+        android:paddingBottom="5dp">
 
         <ImageView
             android:id="@+id/list_icon_paper"
@@ -163,8 +161,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:paddingBottom="5dp"
-        android:paddingTop="5dp">
+        android:paddingBottom="10dp">
 
         <ImageView
             android:id="@+id/list_icon_scissors"

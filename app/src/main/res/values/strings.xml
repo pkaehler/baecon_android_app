@@ -14,4 +14,8 @@
     <string name="ok_label">kk</string>
     <string name="cancel_label">nope</string>
 
+    <string name="lost_against">lost against</string>
+    <string name="won_against">won against</string>
+    <string name="drawn_against">tied against</string>
+
 </resources>

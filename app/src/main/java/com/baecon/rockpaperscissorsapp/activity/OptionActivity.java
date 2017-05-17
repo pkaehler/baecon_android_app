@@ -17,10 +17,14 @@ import android.widget.TextView;
 import com.baecon.rockpaperscissorsapp.R;
 import com.baecon.rockpaperscissorsapp.adapter.PlayerAdapter;
 import com.baecon.rockpaperscissorsapp.db.DatabaseHandler;
+import com.baecon.rockpaperscissorsapp.model.ReturnedErrorMessage;
 import com.baecon.rockpaperscissorsapp.model.User;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;
 import com.baecon.rockpaperscissorsapp.rest.ApiInterface;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,13 +60,16 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
         adapter.addAll(userList);
         adapter.notifyDataSetChanged();
 
+        final ListView listView = (ListView) findViewById(R.id.list_players);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(this);
+
         Button buttonPlayername = (Button) findViewById(R.id.savePlayername);
         final EditText playerNameEditText = (EditText) findViewById(R.id.inputPlayername);
         buttonPlayername.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Log.d(TAG,"Just clicked save");
                         playerName = playerNameEditText.getText().toString();
                         if (!db.checkIfValueExists(playerName)){
                             Log.d(TAG,"Player schon vorhanden? " + db.checkIfValueExists(playerName));
@@ -70,13 +77,10 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
                             editor.putString("playername",playerName);
                             editor.commit();
                             List<User> userList = db.getAllPlayer();
-                            adapter.clear();
-                            adapter.addAll(userList);
-                            adapter.notifyDataSetChanged();
-                            Map<String,?> allEntries = sharedPrefs.getAll();
-                            for (Map.Entry<String,?> entry : allEntries.entrySet()){
-                                Log.d(TAG,"Alle Einträge: " + entry.getKey() + " und Value " + entry.getValue().toString());
-                            }
+//                            Map<String,?> allEntries = sharedPrefs.getAll();
+//                            for (Map.Entry<String,?> entry : allEntries.entrySet()){
+//                                Log.d(TAG,"Alle Einträge: " + entry.getKey() + " und Value " + entry.getValue().toString());
+//                            }
 
                         } else {
                             new AlertDialog.Builder(OptionActivity.this)
@@ -97,26 +101,20 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-        final String active_player = sharedPrefs.getString("playername",null);
+                final String active_player = sharedPrefs.getString("playername",null);
                 new AlertDialog.Builder(OptionActivity.this)
-                        .setTitle("Jo")
-                        .setMessage("r u sure? Delete " + active_player)
-                        .setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                        .setMessage("Are u sure? Delete " + active_player)
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 //TODO wird nicht wirklich entfernt
-                                //wenn man auf main zurück wechselt, dann ist Spieler immer noch da
                                 editor.remove("playername");
                                 editor.commit();
                                 db.deletePlayer(active_player);
-                                List<User> newUserList = db.getAllPlayer();
-                                for (User temp : newUserList){
-                                    Log.d(TAG,"Alle Spieler Einträge: " + temp.getId() + " und Name " + temp.getName());
-                                }
-                                Map<String,?> allEntries = sharedPrefs.getAll();
-                                for (Map.Entry<String,?> entry : allEntries.entrySet()){
-                                    Log.d(TAG,"Alle Einträge: " + entry.getKey() + " und Value " + entry.getValue().toString());
-                                }
+//                                adapter.clear();
+//                                adapter.addAll(newUserList);
+//                                adapter.notifyDataSetChanged();
+
                             }
                         })
                         .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -129,9 +127,7 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
             }
         });
 
-        final ListView listView = (ListView) findViewById(R.id.list_players);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(this);
+
 
     }
 
@@ -143,22 +139,44 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call call, Response response) {
-                //TODO Errorhandling
-                Log.d(TAG, "Getting Response");
-                User newUser = (User) response.body();
-                Log.d(TAG, "Writing player to db: " + newUser.getId() + " " + newUser.getName());
-                db.addPlayer(newUser);
+                if (response.code() == 400) {
+                    Gson gson = new GsonBuilder().create();
+                    ReturnedErrorMessage errorMessage;
 
-                new AlertDialog.Builder(OptionActivity.this)
-                        .setTitle("Loot upassen")
-                        .setMessage("player was born: " + newUser.getId() + " " + newUser.getName())
-                        .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        errorMessage = gson.fromJson(response.errorBody().string(), ReturnedErrorMessage.class);
+                        new AlertDialog.Builder(OptionActivity.this)
+                                .setMessage("something went wrong. Got: " + errorMessage.getErrorCode() + " with message " + errorMessage.getErrorMessage())
+                                .setNegativeButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
 
-                            }
-                        })
-                        .show();
+                                    }
+                                })
+                                .show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Log.d(TAG, "Getting Response");
+                    User newUser = (User) response.body();
+                    Log.d(TAG, "Writing player to db: " + newUser.getId() + " " + newUser.getName());
+                    db.addPlayer(newUser);
+                    List<User> newUserList = db.getAllPlayer();
+                    adapter.clear();
+                    adapter.addAll(newUserList);
+                    adapter.notifyDataSetChanged();
+
+                    new AlertDialog.Builder(OptionActivity.this)
+                            .setMessage("player was born: " + newUser.getId() + " " + newUser.getName())
+                            .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })
+                            .show();
+                }
             }
 
             @Override
@@ -173,7 +191,7 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String item = adapter.getItem(position).getName();
-                editor.clear();
+                editor.remove("playername");
                 editor.putString("playername",item);
                 editor.commit();
 

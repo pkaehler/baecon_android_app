@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
 
+import com.baecon.rockpaperscissorsapp.adapter.LastGamesAdapter;
 import com.baecon.rockpaperscissorsapp.adapter.ResultAdapter;
 import com.baecon.rockpaperscissorsapp.R;
 import com.baecon.rockpaperscissorsapp.db.DatabaseHandler;
@@ -29,7 +30,8 @@ import retrofit2.Response;
 
 public class HistoryActivity extends AppCompatActivity {
     private static final String TAG = HistoryActivity.class.getSimpleName();
-    private ResultAdapter adapter;
+    private ResultAdapter resultAdapter;
+    private LastGamesAdapter lastGamesAdapter;
     private static int id_player;
     private static String playerName;
 
@@ -42,7 +44,8 @@ public class HistoryActivity extends AppCompatActivity {
         final DatabaseHandler db = new DatabaseHandler(this);
         Log.d(TAG, "Database created");
 
-        adapter = new ResultAdapter(this, new ArrayList<Stats>());
+        resultAdapter = new ResultAdapter(this, new ArrayList<Stats>());
+        lastGamesAdapter = new LastGamesAdapter(this, new ArrayList<GameResult>());
         sharedPreferences = getSharedPreferences("userstats",MODE_PRIVATE);
         playerName = sharedPreferences.getString("playername",null);
         Log.d(TAG,"Player in Pref: " + playerName);
@@ -51,6 +54,7 @@ public class HistoryActivity extends AppCompatActivity {
         Log.d(TAG,"id player: " + id_player);
         if (id_player != 0 ){
             getLastGames(id_player);
+            getAllGamesForPlayer(id_player);
         } else{
             new AlertDialog.Builder(HistoryActivity.this)
                     .setMessage("No player found")
@@ -63,10 +67,10 @@ public class HistoryActivity extends AppCompatActivity {
                     .show();
         }
 
-        ListView listView = (ListView) findViewById(R.id.list);
-        listView.setAdapter(adapter);
-
-         getAllGamesForPlayer(id_player);
+        ListView listView = (ListView) findViewById(R.id.historyList);
+        listView.setAdapter(resultAdapter);
+        ListView lastGamesView = (ListView) findViewById(R.id.lastGamesList);
+        lastGamesView.setAdapter(lastGamesAdapter);
     }
 
     private void getAllGamesForPlayer(int id_player){
@@ -96,25 +100,13 @@ public class HistoryActivity extends AppCompatActivity {
                     }
                 } else {
                     List<GameResult> resource = response.body();
-                    // TODO adapter für alle Spiele schreiben oder den bestehenden nutzen
-                    // knallt noch wenn es keine Spiele gab
-                    // die resource ist wahrscheinlich nicht null sondern hat einfach nur ein leeres format...
-                    // postman aufruf checken
+                    // if wird wahrscheinlich nicht benötigt
                     if (resource != null && resource.size() > 0){
-                        new AlertDialog.Builder(HistoryActivity.this)
-                                .setMessage("last Games was a: " + resource.get(0).getResult() + " against " + resource.get(0).getOption())
-                                .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                })
-                                .show();
+                        lastGamesAdapter.clear();
+                        lastGamesAdapter.addAll(resource);
+                        lastGamesAdapter.notifyDataSetChanged();
                     }
 
-
-//                  Log.d(TAG,resource.toString());
-//                  Log.d(TAG,"Name in Ressource: " + resource.getUser().getName());
                 }
 
             }
@@ -156,12 +148,10 @@ public class HistoryActivity extends AppCompatActivity {
                     }
                 }
                 Stats resource = response.body();
-//                  Log.d(TAG,resource.toString());
-//                  Log.d(TAG,"Name in Ressource: " + resource.getUser().getName());
 
-                adapter.clear();
-                adapter.addAll(resource);
-                adapter.notifyDataSetChanged();
+                resultAdapter.clear();
+                resultAdapter.addAll(resource);
+                resultAdapter.notifyDataSetChanged();
             }
 
             @Override

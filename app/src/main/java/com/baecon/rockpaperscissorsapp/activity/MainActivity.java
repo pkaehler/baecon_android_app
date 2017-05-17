@@ -6,7 +6,7 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private ProximityManager proximityManager;
     private static final String APIKEY = "ok";
     private String playerName;
-    private String beachonID = "4LKv";
+    private String id_beacon = "4LKv";
 
 
     SharedPreferences sharedPrefs;
@@ -130,22 +130,24 @@ public class MainActivity extends AppCompatActivity {
         return new SimpleIBeaconListener() {
             @Override
             public void onIBeaconDiscovered(IBeaconDevice ibeacon, IBeaconRegion region) {
-
-
-                isValidBeacon(beachonID);
-//                isValidBeacon(String.valueOf(ibeacon.getUniqueId()));
-
-                    // TODO id_beacon in lokale db
+                //Check if emulator is running
+                String fingerprint = Build.FINGERPRINT;
+                boolean isEmulator = false;
+                if (fingerprint != null) {
+                    isEmulator = fingerprint.contains("vbox") || fingerprint.contains("generic");
+                }
+                Log.d(TAG, "Running in Emulator: " + isEmulator);
+                isValidBeacon(isEmulator == true ? id_beacon : String.valueOf(ibeacon.getUniqueId()));
 
                 }
         };
     }
 
-    private void isValidBeacon(final String beaconID){
+    private void isValidBeacon(final String id_beacon){
         final DatabaseHandler db = new DatabaseHandler(this);
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-        Call<String> call = apiService.isvalidbeacon(beaconID);
-            Log.d(TAG,"returning True for UUID: " + beaconID);
+        Call<String> call = apiService.isvalidbeacon(id_beacon);
+            Log.d(TAG,"returning True for UUID: " + id_beacon);
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
@@ -174,18 +176,18 @@ public class MainActivity extends AppCompatActivity {
                         boolean sawBeaconOverlay = getSharedPreferences("userstats", MODE_PRIVATE).getBoolean("sawBeaconOverlay", false);
 
                         String isValid = response.body();
-                        editor.putString("id_beacon", beaconID);
+                        editor.putString("id_beacon", id_beacon);
                         editor.commit();
 
                         if (isValid.equals("true")) {
                             NotificationCompat.Builder mBuilder =
-                                    (NotificationCompat.Builder) new NotificationCompat.Builder(MainActivity.this)
+                                    new NotificationCompat.Builder(MainActivity.this)
                                             .setSmallIcon(R.drawable.battleicon)
                                             .setContentTitle("Yo")
                                             .setContentText("wanna fight?")
                                             .setAutoCancel(true);
                             Intent notificationIntent = new Intent(MainActivity.this, GameActivity.class);
-                            PendingIntent notificaitonPendingIntent =
+                            PendingIntent notificationPendingIntent =
                                     PendingIntent.getActivity(
                                             MainActivity.this,
                                             0,
@@ -193,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                                             PendingIntent.FLAG_UPDATE_CURRENT
                                     );
 
-                            mBuilder.setContentIntent(notificaitonPendingIntent);
+                            mBuilder.setContentIntent(notificationPendingIntent);
 
                             int mNotificationId = 001;
                             NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -237,12 +239,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
+        Log.d(TAG, "wird auch ausgeführt oder?");
         sharedPrefs = getSharedPreferences("userstats", MODE_PRIVATE);
         playerName = sharedPrefs.getString("playername",null);
+        Log.d(TAG, "onRestart: " + playerName);
         if (playerName != null){
             TextView active_player = (TextView) findViewById(R.id.main_active_player);
             active_player.setText(playerName);
             active_player.setAlpha(1f);
+        } else {
+            TextView active_player = (TextView) findViewById(R.id.main_active_player);
+            active_player.setAlpha(0f);
         }
+
     }
 }
