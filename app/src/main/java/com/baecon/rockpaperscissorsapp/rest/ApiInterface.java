@@ -17,11 +17,16 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface ApiInterface {
+
+
+    @GET
+    Call startBackend();
+
     @GET("stats/{id_player}")
     Call<Stats> getStats(@Path("id_player") int id_player);
 
     @GET("game/{id_game}/{id_player}")
-    String getGameOutcome(@Path("id_game") int id_game, @Path("id_player") int id_player);
+    Call<GameResult> getGameOutcome(@Path("id_game") int id_game, @Path("id_player") int id_player);
 
     @FormUrlEncoded
     @POST("move")
@@ -36,6 +41,5 @@ public interface ApiInterface {
 
     @GET("allgamesforplayer/{id_player}")
     Call<List<GameResult>> getAllGamesForPlayer(@Path("id_player") int id_player);
-
 
 }

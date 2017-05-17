@@ -65,6 +65,8 @@ public class HistoryActivity extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setAdapter(adapter);
+
+        getAllGamesForPlayer(id_player);
     }
 
     private void getAllGamesForPlayer(int id_player){
@@ -95,6 +97,18 @@ public class HistoryActivity extends AppCompatActivity {
                 } else {
                     List<GameResult> resource = response.body();
                     // TODO adapter für alle Spiele schreiben oder den bestehenden nutzen
+                    if (resource.get(0) != null){
+                        new AlertDialog.Builder(HistoryActivity.this)
+                                .setMessage("last Games was a: " + resource.get(0).getResult() + " against " + resource.get(0).getOption())
+                                .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                })
+                                .show();
+                    }
+
 //                  Log.d(TAG,resource.toString());
 //                  Log.d(TAG,"Name in Ressource: " + resource.getUser().getName());
                 }

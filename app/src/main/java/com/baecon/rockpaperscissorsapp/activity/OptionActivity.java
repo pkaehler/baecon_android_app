@@ -69,6 +69,10 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
                             createPlayer(playerName);
                             editor.putString("playername",playerName);
                             editor.commit();
+                            List<User> userList = db.getAllPlayer();
+                            adapter.clear();
+                            adapter.addAll(userList);
+                            adapter.notifyDataSetChanged();
                             Map<String,?> allEntries = sharedPrefs.getAll();
                             for (Map.Entry<String,?> entry : allEntries.entrySet()){
                                 Log.d(TAG,"Alle Einträge: " + entry.getKey() + " und Value " + entry.getValue().toString());
@@ -100,7 +104,9 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
                         .setPositiveButton("delete", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                editor.clear();
+                                //TODO wird nicht wirklich entfernt
+                                //wenn man auf main zurück wechselt, dann ist Spieler immer noch da
+                                editor.remove("playername");
                                 editor.commit();
                                 db.deletePlayer(active_player);
                                 List<User> newUserList = db.getAllPlayer();
@@ -137,6 +143,7 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call call, Response response) {
+                //TODO Errorhandling
                 Log.d(TAG, "Getting Response");
                 User newUser = (User) response.body();
                 Log.d(TAG, "Writing player to db: " + newUser.getId() + " " + newUser.getName());
@@ -165,7 +172,6 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.d(TAG,"Wird noch aufgerufen");
         String item = adapter.getItem(position).getName();
                 editor.clear();
                 editor.putString("playername",item);

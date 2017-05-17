@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baecon.rockpaperscissorsapp.R;
+import com.baecon.rockpaperscissorsapp.db.DatabaseHandler;
 import com.baecon.rockpaperscissorsapp.model.ReturnedErrorMessage;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;
 import com.baecon.rockpaperscissorsapp.rest.ApiInterface;
@@ -51,9 +52,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         sharedPrefs = getSharedPreferences("userstats", MODE_PRIVATE);
         editor = sharedPrefs.edit();
+        editor.putBoolean("sawBeaconOverlay", false);
+        editor.commit();
         playerName = sharedPrefs.getString("playername",null);
         if (playerName != null){
             TextView active_player = (TextView) findViewById(R.id.main_active_player);
@@ -129,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
             public void onIBeaconDiscovered(IBeaconDevice ibeacon, IBeaconRegion region) {
 
                 isValidBeacon(String.valueOf(ibeacon.getUniqueId()));
+
                     // TODO id_beacon in lokale db
 
                 }
@@ -136,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void isValidBeacon(final String beaconID){
+        final DatabaseHandler db = new DatabaseHandler(this);
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
         Call<String> call = apiService.isvalidbeacon(beaconID);
             Log.d(TAG,"returning True for UUID: " + beaconID);
@@ -166,10 +170,10 @@ public class MainActivity extends AppCompatActivity {
 
                         boolean sawBeaconOverlay = getSharedPreferences("userstats", MODE_PRIVATE).getBoolean("sawBeaconOverlay", false);
 
-
                         String isValid = response.body();
                         editor.putString("id_beacon", beaconID);
                         editor.commit();
+
                         if (isValid.equals("true")) {
                             NotificationCompat.Builder mBuilder =
                                     (NotificationCompat.Builder) new NotificationCompat.Builder(MainActivity.this)
@@ -230,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
+        sharedPrefs = getSharedPreferences("userstats", MODE_PRIVATE);
         playerName = sharedPrefs.getString("playername",null);
         if (playerName != null){
             TextView active_player = (TextView) findViewById(R.id.main_active_player);

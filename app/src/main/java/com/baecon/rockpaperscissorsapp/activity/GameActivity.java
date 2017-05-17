@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.media.Image;
+import android.nfc.Tag;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 
 import com.baecon.rockpaperscissorsapp.R;
 import com.baecon.rockpaperscissorsapp.db.DatabaseHandler;
+import com.baecon.rockpaperscissorsapp.model.GameResult;
 import com.baecon.rockpaperscissorsapp.model.Move;
 import com.baecon.rockpaperscissorsapp.model.ReturnedErrorMessage;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;
@@ -55,8 +57,8 @@ public class GameActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences("userstats",MODE_PRIVATE);
         playerName = sharedPreferences.getString("playername",null);
-//        id_beacon = sharedPreferences.getString("id_beacon",null);
-        id_beacon = "4LKv";
+        id_beacon = sharedPreferences.getString("id_beacon",null);
+//        id_beacon = "4LKv";
         id_player = db.getPlayer(playerName).getId();
 
         final ImageView rock = (ImageView) findViewById(R.id.rockBattleOption);
@@ -125,7 +127,7 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void fight(String id_beacon, int id_player, String option){
+    private void fight(String id_beacon, final int id_player, String option){
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
         Call<Move> call = apiService.setMove(id_beacon,id_player,option);
         call.enqueue(new Callback<Move>() {
@@ -153,15 +155,37 @@ public class GameActivity extends AppCompatActivity {
                 }
                 Move resource = response.body();
                 if (resource.getSecondFigure() != null ){
-                    new AlertDialog.Builder(GameActivity.this)
-                            .setMessage("made move against: " + resource.getFirstUser().getName() + " with Option: " + resource.getFirstFigure())
-                            .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
+                    int gameId = resource.getId();
+                    Log.d(TAG,"GameID: " + gameId);
+                    ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+                    Call<GameResult> callResult = apiService.getGameOutcome(gameId,id_player);
+                    Log.d(TAG,callResult.request().toString());
+                    callResult.enqueue(new Callback<GameResult>() {
+                        @Override
+                        public void onResponse(Call<GameResult> call, Response<GameResult> response) {
+                            //TODO error handling
+                            GameResult result = response.body();
+                            Log.d(TAG,"here is the result: "  + result.getResult());
+                            //TODO überarbeiten mit Bild
+                            new AlertDialog.Builder(GameActivity.this)
+                                    .setMessage("you " + result.getResult() + " against " + result.getOption())
+//                                    .setIcon(R.drawable.)
+                                    .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
 
-                                }
-                            })
-                            .show();
+                                        }
+                                    })
+                                    .show();
+
+                        }
+                        @Override
+                        public void onFailure(Call<GameResult> call, Throwable t) {
+                            Log.d(TAG,t.toString());
+                            call.cancel();
+                        }
+                    });
+
                 } else {
                     new AlertDialog.Builder(GameActivity.this)
                             .setMessage("you are the first player: " + resource.getFirstUser().getName() + " with Option: " + resource.getFirstFigure())
