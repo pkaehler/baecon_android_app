@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.baecon.rockpaperscissorsapp.model.Beacon;
 import com.baecon.rockpaperscissorsapp.model.User;
 
 import java.sql.ResultSet;
@@ -27,7 +28,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     private static final String FIELD_ID = "id";
     private static final String FIELD_NAME = "name";
     private static final String FIELD_ACTIVE = "is_active";
-    private static final String FIELD_VALID = "is_valid";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -40,13 +40,8 @@ public class DatabaseHandler extends SQLiteOpenHelper{
                 + FIELD_NAME + " TEXT"
                 + FIELD_ACTIVE + " INTEGER"
                 + ")";
-        String CREATE_BEACON_TABLE = "CREATE TABLE " + TABLE_BEACONS + "("
-                + FIELD_ID + " INTEGER PRIMARY KEY, "
-                + FIELD_VALID + " INTEGER"
-                + ")";
 
         db.execSQL(CREATE_PLAYER_TABLE);
-        db.execSQL(CREATE_BEACON_TABLE);
 
     }
 
@@ -119,10 +114,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
             } while (cursor.moveToNext());
         }
         return userList;
-
-    }
-
-    public void addBeacon(int id_beacon){
 
     }
 
