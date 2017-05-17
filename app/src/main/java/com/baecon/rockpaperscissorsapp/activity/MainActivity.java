@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private ProximityManager proximityManager;
     private static final String APIKEY = "ok";
     private String playerName;
+    private String beachonID = "4LKv";
 
 
     SharedPreferences sharedPrefs;
@@ -130,7 +131,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onIBeaconDiscovered(IBeaconDevice ibeacon, IBeaconRegion region) {
 
-                isValidBeacon(String.valueOf(ibeacon.getUniqueId()));
+
+                isValidBeacon(beachonID);
+//                isValidBeacon(String.valueOf(ibeacon.getUniqueId()));
 
                     // TODO id_beacon in lokale db
 

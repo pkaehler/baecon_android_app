@@ -66,7 +66,7 @@ public class HistoryActivity extends AppCompatActivity {
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setAdapter(adapter);
 
-        getAllGamesForPlayer(id_player);
+         getAllGamesForPlayer(id_player);
     }
 
     private void getAllGamesForPlayer(int id_player){
@@ -97,7 +97,10 @@ public class HistoryActivity extends AppCompatActivity {
                 } else {
                     List<GameResult> resource = response.body();
                     // TODO adapter für alle Spiele schreiben oder den bestehenden nutzen
-                    if (resource.get(0) != null){
+                    // knallt noch wenn es keine Spiele gab
+                    // die resource ist wahrscheinlich nicht null sondern hat einfach nur ein leeres format...
+                    // postman aufruf checken
+                    if (resource != null && resource.size() > 0){
                         new AlertDialog.Builder(HistoryActivity.this)
                                 .setMessage("last Games was a: " + resource.get(0).getResult() + " against " + resource.get(0).getOption())
                                 .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
@@ -108,6 +111,7 @@ public class HistoryActivity extends AppCompatActivity {
                                 })
                                 .show();
                     }
+
 
 //                  Log.d(TAG,resource.toString());
 //                  Log.d(TAG,"Name in Ressource: " + resource.getUser().getName());
