@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -24,16 +23,25 @@ import com.baecon.rockpaperscissorsapp.rest.ApiClient;
 import com.baecon.rockpaperscissorsapp.rest.ApiInterface;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.kontakt.sdk.android.ble.configuration.ActivityCheckConfiguration;
+import com.kontakt.sdk.android.ble.configuration.ForceScanConfiguration;
+import com.kontakt.sdk.android.ble.configuration.ScanMode;
+import com.kontakt.sdk.android.ble.configuration.ScanPeriod;
 import com.kontakt.sdk.android.ble.connection.OnServiceReadyListener;
 import com.kontakt.sdk.android.ble.manager.ProximityManager;
 import com.kontakt.sdk.android.ble.manager.ProximityManagerFactory;
 import com.kontakt.sdk.android.ble.manager.listeners.IBeaconListener;
 import com.kontakt.sdk.android.ble.manager.listeners.simple.SimpleIBeaconListener;
+import com.kontakt.sdk.android.ble.rssi.RssiCalculators;
+import com.kontakt.sdk.android.ble.spec.EddystoneFrameType;
 import com.kontakt.sdk.android.common.KontaktSDK;
 import com.kontakt.sdk.android.common.profile.IBeaconDevice;
 import com.kontakt.sdk.android.common.profile.IBeaconRegion;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,16 +63,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         final DatabaseHandler db = new DatabaseHandler(this);
 
         db.deleteInvalidBeacons();
-        Log.d(TAG,"Beacons Table existiert: " + db.checkIfTableExists("beacons"));
 
         sharedPrefs = getSharedPreferences("userstats", MODE_PRIVATE);
-        editor = sharedPrefs.edit();
-        editor.putBoolean("sawBeaconOverlay", false);
-        editor.commit();
         playerName = sharedPrefs.getString("playername",null);
         if (playerName != null){
             TextView active_player = (TextView) findViewById(R.id.main_active_player);
@@ -99,11 +102,67 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // TODO remove Kontakt.io but use public ibeacon listener
         KontaktSDK.initialize(APIKEY);
 
         proximityManager = ProximityManagerFactory.create(this);
-        proximityManager.setIBeaconListener(createIBeaconListener());
+        // Set config for scanning and stuff
+//        proximityManager.configuration()
+//                .scanMode(ScanMode.BALANCED)
+//                .scanPeriod(ScanPeriod.RANGING)
+//                .activityCheckConfiguration(ActivityCheckConfiguration.DISABLED)
+//                .forceScanConfiguration(ForceScanConfiguration.DISABLED)
+//                .deviceUpdateCallbackInterval(TimeUnit.SECONDS.toMillis(5))
+//                .rssiCalculator(RssiCalculators.DEFAULT)
+//                .cacheFileName("Example")
+//                .resolveShuffledInterval(3)
+//                .monitoringEnabled(true)
+//                .monitoringSyncInterval(10)
+//                .eddystoneFrameTypes(Arrays.asList(EddystoneFrameType.UID, EddystoneFrameType.URL));
+        proximityManager.setIBeaconListener(new IBeaconListener() {
+            @Override
+            public void onIBeaconDiscovered(IBeaconDevice iBeacon, IBeaconRegion region) {
+                //Check if emulator is running
+                String fingerprint = Build.FINGERPRINT;
+                boolean isEmulator = false;
+                if (fingerprint != null) {
+                    isEmulator = fingerprint.contains("vbox") || fingerprint.contains("generic");
+                }
+                Log.d(TAG, "Running in Emulator: " + isEmulator);
+                isValidBeacon(isEmulator == true ? id_beacon : String.valueOf(iBeacon.getUniqueId()));
+
+            }
+
+            @Override
+            public void onIBeaconsUpdated(List<IBeaconDevice> iBeacons, IBeaconRegion region) {
+                //Beacons updated
+            }
+
+            @Override
+            public void onIBeaconLost(IBeaconDevice iBeacon, IBeaconRegion region) {
+                //Beacon lost
+                Log.d(TAG, "Lost connection to Beacon");
+                db.deleteInvalidBeacons();
+                ImageView beaconIconVisible = (ImageView) findViewById(R.id.beaconFound);
+                beaconIconVisible.setAlpha(0f);
+
+            }
+        });
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        sharedPrefs = getSharedPreferences("userstats", MODE_PRIVATE);
+        playerName = sharedPrefs.getString("playername",null);
+        if (playerName != null){
+            TextView active_player = (TextView) findViewById(R.id.main_active_player);
+            active_player.setText(playerName);
+            active_player.setAlpha(1f);
+        } else {
+            TextView active_player = (TextView) findViewById(R.id.main_active_player);
+            active_player.setAlpha(0f);
+        }
 
     }
 
@@ -135,22 +194,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private IBeaconListener createIBeaconListener() {
-        return new SimpleIBeaconListener() {
-            @Override
-            public void onIBeaconDiscovered(IBeaconDevice ibeacon, IBeaconRegion region) {
-                //Check if emulator is running
-                String fingerprint = Build.FINGERPRINT;
-                boolean isEmulator = false;
-                if (fingerprint != null) {
-                    isEmulator = fingerprint.contains("vbox") || fingerprint.contains("generic");
-                }
-                Log.d(TAG, "Running in Emulator: " + isEmulator);
-                isValidBeacon(isEmulator == true ? id_beacon : String.valueOf(ibeacon.getUniqueId()));
-
-                }
-        };
-    }
 
     private void isValidBeacon(final String id_beacon){
         final DatabaseHandler db = new DatabaseHandler(this);
@@ -182,62 +225,37 @@ public class MainActivity extends AppCompatActivity {
                         ImageView beaconIconVisible = (ImageView) findViewById(R.id.beaconFound);
                         beaconIconVisible.setAlpha(1f);
 
-                        boolean sawBeaconOverlay = getSharedPreferences("userstats", MODE_PRIVATE).getBoolean("sawBeaconOverlay", false);
-
                         String isValid = response.body();
-                        editor.putString("id_beacon", id_beacon);
-                        editor.commit();
-
-                        db.addBeacon(new Beacon(id_beacon));
-
-
-
-                        //TODO if push is clicked only opens fight menu without option to go back to main and change player
                         if (isValid.equals("true")) {
-                            NotificationCompat.Builder mBuilder =
-                                    new NotificationCompat.Builder(MainActivity.this)
-                                            .setSmallIcon(R.drawable.battleicon)
-                                            .setContentTitle("Yo")
-                                            .setContentText("wanna fight?")
-                                            .setAutoCancel(true);
-                            Intent notificationIntent = new Intent(MainActivity.this, GameActivity.class);
-                            PendingIntent notificationPendingIntent =
-                                    PendingIntent.getActivity(
-                                            MainActivity.this,
-                                            0,
-                                            notificationIntent,
-                                            PendingIntent.FLAG_UPDATE_CURRENT
-                                    );
-
-                            mBuilder.setContentIntent(notificationPendingIntent);
-
-                            int mNotificationId = 001;
-                            NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
-
-                            if (!sawBeaconOverlay){
-                                editor.putBoolean("sawBeaconOverlay",true);
-                                editor.commit();
-
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setIcon(R.drawable.battleicon)
-                                        .setMessage("Beacon gefunden. Want to play a game?")
-                                        .setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
-                                                startActivity(gameIntent);
-                                            }
-                                        })
-                                        .setNegativeButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-
-                                            }
-                                        })
-                                        .show();
-                            }
+                            db.addBeacon(new Beacon(id_beacon));
+                        } else {
+                            Log.d(TAG,"Beacon ID ungültig. Antwort von isValid: " + isValid);
                         }
+
+
+//                        if (isValid.equals("true")) {
+//                            NotificationCompat.Builder mBuilder =
+//                                    new NotificationCompat.Builder(MainActivity.this)
+//                                            .setSmallIcon(R.drawable.battleicon)
+//                                            .setContentTitle("Yo")
+//                                            .setContentText("wanna fight?")
+//                                            .setAutoCancel(true);
+//                            Intent notificationIntent = new Intent(MainActivity.this, MainActivity.class);
+//                            PendingIntent notificationPendingIntent =
+//                                    PendingIntent.getActivity(
+//                                            MainActivity.this,
+//                                            0,
+//                                            notificationIntent,
+//                                            PendingIntent.FLAG_UPDATE_CURRENT
+//                                    );
+//
+//                            mBuilder.setContentIntent(notificationPendingIntent);
+//
+//                            int mNotificationId = 001;
+//                            NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
+//
+//                        }
                     }
                 }
 
@@ -247,24 +265,6 @@ public class MainActivity extends AppCompatActivity {
                     call.cancel();
                 }
             });
-
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(TAG, "wird auch ausgeführt oder?");
-        sharedPrefs = getSharedPreferences("userstats", MODE_PRIVATE);
-        playerName = sharedPrefs.getString("playername",null);
-        Log.d(TAG, "onRestart: " + playerName);
-        if (playerName != null){
-            TextView active_player = (TextView) findViewById(R.id.main_active_player);
-            active_player.setText(playerName);
-            active_player.setAlpha(1f);
-        } else {
-            TextView active_player = (TextView) findViewById(R.id.main_active_player);
-            active_player.setAlpha(0f);
-        }
 
     }
 

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.baecon.rockpaperscissorsapp.R;
 import com.baecon.rockpaperscissorsapp.adapter.PlayerAdapter;
 import com.baecon.rockpaperscissorsapp.db.DatabaseHandler;
+import com.baecon.rockpaperscissorsapp.model.Beacon;
 import com.baecon.rockpaperscissorsapp.model.ReturnedErrorMessage;
 import com.baecon.rockpaperscissorsapp.model.User;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;
@@ -76,12 +77,6 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
                             createPlayer(playerName);
                             editor.putString("playername",playerName);
                             editor.commit();
-//                            List<User> userList = db.getAllPlayer();
-//                            Map<String,?> allEntries = sharedPrefs.getAll();
-//                            for (Map.Entry<String,?> entry : allEntries.entrySet()){
-//                                Log.d(TAG,"Alle Einträge: " + entry.getKey() + " und Value " + entry.getValue().toString());
-//                            }
-
                         } else {
                             new AlertDialog.Builder(OptionActivity.this)
                                     .setTitle("Jo")
@@ -107,7 +102,6 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
                         .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                //TODO wird nicht wirklich entfernt
                                 editor.remove("playername");
                                 editor.commit();
                                 db.deletePlayer(active_player);
@@ -127,9 +121,6 @@ public class OptionActivity extends AppCompatActivity implements AdapterView.OnI
                         .show();
             }
         });
-
-
-
     }
 
     public void createPlayer(String name){

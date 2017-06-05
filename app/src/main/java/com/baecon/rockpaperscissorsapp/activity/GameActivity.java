@@ -155,10 +155,8 @@ public class GameActivity extends AppCompatActivity {
                     callResult.enqueue(new Callback<GameResult>() {
                         @Override
                         public void onResponse(Call<GameResult> call, Response<GameResult> response) {
-                            //TODO error handling
                             GameResult result = response.body();
                             Log.d(TAG,"here is the result: "  + result.getResult());
-                            //TODO überarbeiten mit Bild
                             new AlertDialog.Builder(GameActivity.this)
                                     .setMessage("you " + result.getResult() + " with " + result.getOption())
 //                                    .setIcon(R.drawable.)
@@ -189,22 +187,6 @@ public class GameActivity extends AppCompatActivity {
                             })
                             .show();
                 }
-
-                //TODO save game result or show if secondUser already exists
-                //TODO Backend: also returns who won (don't want to implement logic here)
-                /**
-                 * Repsonse example
-                 * {
-                 "id": 3,
-                 "firstUser": {
-                 "id": 1,
-                 "name": "User 2"
-                 },
-                 "secondUser": null,
-                 "firstFigure": "SCISSOR",
-                 "secondFigure": null
-                 }
-                 */
             }
 
             @Override

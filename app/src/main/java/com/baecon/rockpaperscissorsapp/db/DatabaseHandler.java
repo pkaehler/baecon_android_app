@@ -23,7 +23,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     private static final String TAG = SQLiteOpenHelper.class.getSimpleName();
 
     private static final int DATABASE_VERSION = 1;
-    private final int VALID_BEACON_TIME = 120000;
+    private final int VALID_BEACON_TIME = 60000;
 
     private static final String DATABASE_NAME = "stats";
     private static final String TABLE_PLAYERS = "players";
