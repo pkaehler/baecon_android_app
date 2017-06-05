@@ -57,7 +57,7 @@ public class HistoryActivity extends AppCompatActivity {
             getAllGamesForPlayer(id_player);
         } else{
             new AlertDialog.Builder(HistoryActivity.this)
-                    .setMessage("No player found")
+                    .setMessage("Kein Spieler ausgewählt.")
                     .setNegativeButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

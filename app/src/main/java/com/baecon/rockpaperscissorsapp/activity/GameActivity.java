@@ -3,14 +3,11 @@ package com.baecon.rockpaperscissorsapp.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.media.Image;
-import android.nfc.Tag;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,23 +20,12 @@ import com.baecon.rockpaperscissorsapp.rest.ApiClient;
 import com.baecon.rockpaperscissorsapp.rest.ApiInterface;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.kontakt.sdk.android.ble.connection.OnServiceReadyListener;
-import com.kontakt.sdk.android.ble.manager.ProximityManager;
-import com.kontakt.sdk.android.ble.manager.ProximityManagerFactory;
-import com.kontakt.sdk.android.ble.manager.listeners.IBeaconListener;
-import com.kontakt.sdk.android.ble.manager.listeners.simple.SimpleIBeaconListener;
-import com.kontakt.sdk.android.common.KontaktSDK;
-import com.kontakt.sdk.android.common.profile.IBeaconDevice;
-import com.kontakt.sdk.android.common.profile.IBeaconRegion;
 
 import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
 public class GameActivity extends AppCompatActivity {
     private static final String TAG = GameActivity.class.getSimpleName();
@@ -64,7 +50,7 @@ public class GameActivity extends AppCompatActivity {
         if (fingerprint != null) {
             isEmulator = fingerprint.contains("vbox") || fingerprint.contains("generic");
         }
-        id_beacon = (isEmulator == true) ? "4LKv" : sharedPreferences.getString("id_beacon",null);
+        id_beacon = (isEmulator == true) ? "4LKv" : db.getValidIdBeacon();
         id_player = db.getPlayer(playerName).getId();
 
         final ImageView rock = (ImageView) findViewById(R.id.rockBattleOption);
@@ -108,7 +94,7 @@ public class GameActivity extends AppCompatActivity {
                     fight(id_beacon, id_player, OPTION);
                 } else if (id_beacon == null){
                     new AlertDialog.Builder(GameActivity.this)
-                            .setMessage("Can't make a move due to missing Beacon")
+                            .setMessage("Kein valider Beacon in der Nähe.")
                             .setPositiveButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -118,7 +104,7 @@ public class GameActivity extends AppCompatActivity {
                             .show();
                 } else {
                     new AlertDialog.Builder(GameActivity.this)
-                            .setMessage("No user found on device")
+                            .setMessage("Kein Spieler ausgewählt.")
                             .setPositiveButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {

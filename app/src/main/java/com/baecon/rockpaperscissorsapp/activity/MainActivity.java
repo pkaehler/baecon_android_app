@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import com.baecon.rockpaperscissorsapp.R;
 import com.baecon.rockpaperscissorsapp.db.DatabaseHandler;
+import com.baecon.rockpaperscissorsapp.model.Beacon;
 import com.baecon.rockpaperscissorsapp.model.ReturnedErrorMessage;
 import com.baecon.rockpaperscissorsapp.rest.ApiClient;
 import com.baecon.rockpaperscissorsapp.rest.ApiInterface;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private ProximityManager proximityManager;
     private static final String APIKEY = "ok";
+    //TODO Refactoring id_beacon, id_player, player_name,... -> clean code
     private String playerName;
     private String id_beacon = "4LKv";
 
@@ -52,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        final DatabaseHandler db = new DatabaseHandler(this);
+
+        db.deleteInvalidBeacons();
+        Log.d(TAG,"Beacons Table existiert: " + db.checkIfTableExists("beacons"));
 
         sharedPrefs = getSharedPreferences("userstats", MODE_PRIVATE);
         editor = sharedPrefs.edit();
@@ -85,16 +93,17 @@ public class MainActivity extends AppCompatActivity {
         logo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
                 startActivity(gameIntent);
             }
         });
 
+        // TODO remove Kontakt.io but use public ibeacon listener
         KontaktSDK.initialize(APIKEY);
 
         proximityManager = ProximityManagerFactory.create(this);
         proximityManager.setIBeaconListener(createIBeaconListener());
-
 
     }
 
@@ -179,6 +188,11 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString("id_beacon", id_beacon);
                         editor.commit();
 
+                        db.addBeacon(new Beacon(id_beacon));
+
+
+
+                        //TODO if push is clicked only opens fight menu without option to go back to main and change player
                         if (isValid.equals("true")) {
                             NotificationCompat.Builder mBuilder =
                                     new NotificationCompat.Builder(MainActivity.this)
@@ -253,4 +267,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
 }
