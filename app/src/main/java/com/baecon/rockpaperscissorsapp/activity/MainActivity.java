@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
 //                .monitoringEnabled(true)
 //                .monitoringSyncInterval(10)
 //                .eddystoneFrameTypes(Arrays.asList(EddystoneFrameType.UID, EddystoneFrameType.URL));
+//        configureProximityManager();
         proximityManager.setIBeaconListener(new IBeaconListener() {
             @Override
             public void onIBeaconDiscovered(IBeaconDevice iBeacon, IBeaconRegion region) {
@@ -147,6 +148,12 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+    private void configureProximityManager() {
+        proximityManager.configuration()
+                .scanMode(ScanMode.BALANCED)
+                .scanPeriod(ScanPeriod.create(TimeUnit.SECONDS.toMillis(10), TimeUnit.SECONDS.toMillis(20)))
+                .activityCheckConfiguration(ActivityCheckConfiguration.DEFAULT);
     }
 
     @Override
@@ -233,29 +240,29 @@ public class MainActivity extends AppCompatActivity {
                         }
 
 
-//                        if (isValid.equals("true")) {
-//                            NotificationCompat.Builder mBuilder =
-//                                    new NotificationCompat.Builder(MainActivity.this)
-//                                            .setSmallIcon(R.drawable.battleicon)
-//                                            .setContentTitle("Yo")
-//                                            .setContentText("wanna fight?")
-//                                            .setAutoCancel(true);
-//                            Intent notificationIntent = new Intent(MainActivity.this, MainActivity.class);
-//                            PendingIntent notificationPendingIntent =
-//                                    PendingIntent.getActivity(
-//                                            MainActivity.this,
-//                                            0,
-//                                            notificationIntent,
-//                                            PendingIntent.FLAG_UPDATE_CURRENT
-//                                    );
-//
-//                            mBuilder.setContentIntent(notificationPendingIntent);
-//
-//                            int mNotificationId = 001;
-//                            NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
-//
-//                        }
+                        if (isValid.equals("true")) {
+                            NotificationCompat.Builder mBuilder =
+                                    new NotificationCompat.Builder(MainActivity.this)
+                                            .setSmallIcon(R.drawable.battleicon)
+                                            .setContentTitle("Yo")
+                                            .setContentText("wanna fight?")
+                                            .setAutoCancel(true);
+                            Intent notificationIntent = new Intent(MainActivity.this, MainActivity.class);
+                            PendingIntent notificationPendingIntent =
+                                    PendingIntent.getActivity(
+                                            MainActivity.this,
+                                            0,
+                                            notificationIntent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT
+                                    );
+
+                            mBuilder.setContentIntent(notificationPendingIntent);
+
+                            int mNotificationId = 001;
+                            NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
+                        }
                     }
                 }
 
