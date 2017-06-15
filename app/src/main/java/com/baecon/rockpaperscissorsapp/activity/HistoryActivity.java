@@ -32,7 +32,7 @@ public class HistoryActivity extends AppCompatActivity {
     private static final String TAG = HistoryActivity.class.getSimpleName();
     private ResultAdapter resultAdapter;
     private LastGamesAdapter lastGamesAdapter;
-    private static int id_player;
+    private static int playerId;
     private static String playerName;
 
     SharedPreferences sharedPreferences;
@@ -49,12 +49,12 @@ public class HistoryActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("userstats",MODE_PRIVATE);
         playerName = sharedPreferences.getString("playername",null);
         Log.d(TAG,"Player in Pref: " + playerName);
-        id_player = db.getPlayer(playerName).getId();
+        playerId = db.getPlayer(playerName).getId();
 
-        Log.d(TAG,"id player: " + id_player);
-        if (id_player != 0 ){
-            getLastGames(id_player);
-            getAllGamesForPlayer(id_player);
+        Log.d(TAG,"id player: " + playerId);
+        if (playerId != 0 ){
+            getLastGames(playerId);
+            getAllGamesForPlayer(playerId);
         } else{
             new AlertDialog.Builder(HistoryActivity.this)
                     .setMessage("Kein Spieler ausgewählt.")
@@ -73,10 +73,10 @@ public class HistoryActivity extends AppCompatActivity {
         lastGamesView.setAdapter(lastGamesAdapter);
     }
 
-    private void getAllGamesForPlayer(int id_player){
+    private void getAllGamesForPlayer(int playerId){
         final ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
 
-        Call<List<GameResult>> call = apiService.getAllGamesForPlayer(id_player);
+        Call<List<GameResult>> call = apiService.getAllGamesForPlayer(playerId);
         call.enqueue(new Callback<List<GameResult>>() {
             @Override
             public void onResponse(Call<List<GameResult>> call, Response<List<GameResult>> response) {

@@ -22,11 +22,11 @@ public interface ApiInterface {
     @GET
     Call startBackend();
 
-    @GET("stats/{id_player}")
-    Call<Stats> getStats(@Path("id_player") int id_player);
+    @GET("stats/{playerId}")
+    Call<Stats> getStats(@Path("playerId") int playerId);
 
-    @GET("game/{id_game}/{id_player}")
-    Call<GameResult> getGameOutcome(@Path("id_game") int id_game, @Path("id_player") int id_player);
+    @GET("game/{gameId}/{playerId}")
+    Call<GameResult> getGameOutcome(@Path("gameId") int gameId, @Path("playerId") int playerId);
 
     @FormUrlEncoded
     @POST("move")
@@ -36,10 +36,10 @@ public interface ApiInterface {
     @POST("registration")
     Call<User> createPlayer(@Field("name") String playerName);
 
-    @GET("isvalidbeacon/{id_beacon}")
-    Call<String> isvalidbeacon(@Path("id_beacon") String id_beacon);
+    @GET("isvalidbeacon/{beaconId}")
+    Call<String> isvalidbeacon(@Path("beaconId") String beaconId);
 
-    @GET("allgamesforplayer/{id_player}")
-    Call<List<GameResult>> getAllGamesForPlayer(@Path("id_player") int id_player);
+    @GET("allgamesforplayer/{playerId}")
+    Call<List<GameResult>> getAllGamesForPlayer(@Path("playerId") int playerId);
 
 }

@@ -4,17 +4,17 @@ package com.baecon.rockpaperscissorsapp.model;
 public class Beacon {
     private static int counter = 0;
     public final int id;
-    public final String id_beacon;
+    public final String beaconId;
 
-    public Beacon(String id_beacon) {
+    public Beacon(String beaconId) {
         this.id = counter++;
-        this.id_beacon = id_beacon;
+        this.beaconId = beaconId;
     }
 
     public int getId() {
         return id;
     }
-    public String getId_beacon() {return id_beacon;}
+    public String getBeaconId() {return beaconId;}
 
 
 }

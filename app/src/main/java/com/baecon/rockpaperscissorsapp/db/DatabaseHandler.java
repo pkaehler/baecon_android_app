@@ -84,7 +84,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         valid_to.add(Calendar.MILLISECOND,VALID_BEACON_TIME);
 
         ContentValues values = new ContentValues();
-        values.put(FIELD_NAME,beacon.getId_beacon());
+        values.put(FIELD_NAME,beacon.getBeaconId());
         values.put(FIELD_VALID_TO, String.valueOf(valid_to));
 
         db.insert(TABLE_BEACONS,null,values);

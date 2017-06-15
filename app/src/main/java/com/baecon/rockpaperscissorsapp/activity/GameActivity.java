@@ -31,8 +31,8 @@ public class GameActivity extends AppCompatActivity {
     private static final String TAG = GameActivity.class.getSimpleName();
     private static String OPTION;
     SharedPreferences sharedPreferences;
-    private static String id_beacon = null;
-    private static int id_player;
+    private static String beaconId = null;
+    private static int playerId;
     private static String playerName;
 
 
@@ -50,8 +50,8 @@ public class GameActivity extends AppCompatActivity {
         if (fingerprint != null) {
             isEmulator = fingerprint.contains("vbox") || fingerprint.contains("generic");
         }
-        id_beacon = (isEmulator == true) ? "4LKv" : db.getValidIdBeacon();
-        id_player = db.getPlayer(playerName).getId();
+        beaconId = (isEmulator == true) ? "4LKv" : db.getValidIdBeacon();
+        playerId = db.getPlayer(playerName).getId();
 
         final ImageView rock = (ImageView) findViewById(R.id.rockBattleOption);
         final ImageView paper = (ImageView) findViewById(R.id.paperBattleOption);
@@ -89,10 +89,10 @@ public class GameActivity extends AppCompatActivity {
         fight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "Fight with following: " + id_beacon + " and player " + id_player + " and option " + OPTION);
-                if (id_beacon != null && id_player != 0) {
-                    fight(id_beacon, id_player, OPTION);
-                } else if (id_beacon == null){
+                Log.d(TAG, "Fight with following: " + beaconId + " and player " + playerId + " and option " + OPTION);
+                if (beaconId != null && playerId != 0) {
+                    fight(beaconId, playerId, OPTION);
+                } else if (beaconId == null){
                     new AlertDialog.Builder(GameActivity.this)
                             .setMessage("Kein valider Beacon in der Nähe.")
                             .setPositiveButton(R.string.cancel_label, new DialogInterface.OnClickListener() {
@@ -119,9 +119,9 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void fight(String id_beacon, final int id_player, String option){
+    private void fight(String beaconId, final int playerId, String option){
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-        Call<Move> call = apiService.setMove(id_beacon,id_player,option);
+        Call<Move> call = apiService.setMove(beaconId,playerId,option);
         call.enqueue(new Callback<Move>() {
             @Override
             public void onResponse(Call<Move> call, Response<Move> response) {
@@ -150,7 +150,7 @@ public class GameActivity extends AppCompatActivity {
                     int gameId = resource.getId();
                     Log.d(TAG,"GameID: " + gameId);
                     ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-                    Call<GameResult> callResult = apiService.getGameOutcome(gameId,id_player);
+                    Call<GameResult> callResult = apiService.getGameOutcome(gameId,playerId);
                     Log.d(TAG,callResult.request().toString());
                     callResult.enqueue(new Callback<GameResult>() {
                         @Override

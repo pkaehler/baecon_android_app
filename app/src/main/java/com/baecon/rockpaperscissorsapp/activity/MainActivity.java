@@ -24,22 +24,17 @@ import com.baecon.rockpaperscissorsapp.rest.ApiInterface;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kontakt.sdk.android.ble.configuration.ActivityCheckConfiguration;
-import com.kontakt.sdk.android.ble.configuration.ForceScanConfiguration;
 import com.kontakt.sdk.android.ble.configuration.ScanMode;
 import com.kontakt.sdk.android.ble.configuration.ScanPeriod;
 import com.kontakt.sdk.android.ble.connection.OnServiceReadyListener;
 import com.kontakt.sdk.android.ble.manager.ProximityManager;
 import com.kontakt.sdk.android.ble.manager.ProximityManagerFactory;
 import com.kontakt.sdk.android.ble.manager.listeners.IBeaconListener;
-import com.kontakt.sdk.android.ble.manager.listeners.simple.SimpleIBeaconListener;
-import com.kontakt.sdk.android.ble.rssi.RssiCalculators;
-import com.kontakt.sdk.android.ble.spec.EddystoneFrameType;
 import com.kontakt.sdk.android.common.KontaktSDK;
 import com.kontakt.sdk.android.common.profile.IBeaconDevice;
 import com.kontakt.sdk.android.common.profile.IBeaconRegion;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -51,13 +46,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private ProximityManager proximityManager;
     private static final String APIKEY = "ok";
-    //TODO Refactoring id_beacon, id_player, player_name,... -> clean code
     private String playerName;
-    private String id_beacon = "4LKv";
+    private String beaconID = "4LKv";
 
 
     SharedPreferences sharedPrefs;
-    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                     isEmulator = fingerprint.contains("vbox") || fingerprint.contains("generic");
                 }
                 Log.d(TAG, "Running in Emulator: " + isEmulator);
-                isValidBeacon(isEmulator == true ? id_beacon : String.valueOf(iBeacon.getUniqueId()));
+                isValidBeacon(isEmulator == true ? beaconID : String.valueOf(iBeacon.getUniqueId()));
 
             }
 
@@ -202,11 +195,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void isValidBeacon(final String id_beacon){
+    private void isValidBeacon(final String beaconId){
         final DatabaseHandler db = new DatabaseHandler(this);
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-        Call<String> call = apiService.isvalidbeacon(id_beacon);
-            Log.d(TAG,"returning True for UUID: " + id_beacon);
+        Call<String> call = apiService.isvalidbeacon(beaconId);
+            Log.d(TAG,"returning True for UUID: " + beaconId);
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
@@ -234,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
 
                         String isValid = response.body();
                         if (isValid.equals("true")) {
-                            db.addBeacon(new Beacon(id_beacon));
+                            db.addBeacon(new Beacon(beaconId));
                         } else {
                             Log.d(TAG,"Beacon ID ungültig. Antwort von isValid: " + isValid);
                         }
